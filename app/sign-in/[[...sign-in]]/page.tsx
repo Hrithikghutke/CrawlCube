@@ -11,7 +11,7 @@ export default function SignInPage() {
   return (
     <main className="min-h-screen bg-black flex overflow-hidden relative">
       {/* Left Column - Visuals */}
-      <div className="hidden lg:flex flex-1 relative bg-[#0a0a0a] items-end justify-center overflow-hidden">
+      <div className="hidden  lg:flex flex-1 relative bg-gradient-to-bl from-neutral-800 to-black  items-end justify-center overflow-hidden">
         {/* Background Isometric Logo - Large, filling center-bottom of left panel */}
         <div className="absolute inset-0 z-0 flex items-end justify-start pointer-events-none">
           <Image
@@ -24,13 +24,24 @@ export default function SignInPage() {
           />
         </div>
 
-        {/* Bottom Prompt Box */}
-        <div className="relative z-20 w-full px-8 pb-20 flex justify-center">
-          <Image
-            src={promptBox}
-            alt="Prompt Example"
-            className="w-full max-w-lg object-contain"
-          />
+        <div className="flex flex-col items-center justify-center w-[100%]">
+          <div className="flex flex-col items-center justify-center pb-7">
+            <h2 className="text-3xl opacity-90 font-bold text-white">
+              Turn your ideas into Reality.
+            </h2>
+            <p className="opacity-50 text-xs mt-2 text-center">
+              Start for free and get attractive offers from the community
+            </p>
+          </div>
+
+          {/* Bottom Prompt Box */}
+          <div className="relative z-20 w-full px-8 pb-20 flex justify-center">
+            <Image
+              src={promptBox}
+              alt="Prompt Example"
+              className="w-full max-w-lg object-contain"
+            />
+          </div>
         </div>
       </div>
 
