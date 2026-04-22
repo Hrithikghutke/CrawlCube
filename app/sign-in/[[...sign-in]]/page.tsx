@@ -25,7 +25,7 @@ export default function SignInPage() {
         </div>
 
         {/* Bottom Prompt Box */}
-        <div className="relative z-20 w-full px-8 pb-8 flex justify-center">
+        <div className="relative z-20 w-full px-8 pb-20 flex justify-center">
           <Image
             src={promptBox}
             alt="Prompt Example"
@@ -37,7 +37,7 @@ export default function SignInPage() {
       {/* Right Column - Sign In Widget */}
       <div className="flex-1 flex items-center justify-center p-4 z-30 bg-black relative overflow-hidden">
         {/* Semicircle Blob - Right edge of left panel */}
-        <div className="absolute bottom-[-1%] left-[-10%] z-0 w-56 h-56 pointer-events-none ">
+        <div className="absolute bottom-[-1%] left-[-15%] md:left-[-10%] lg:left-[-10%] z-0 w-56 h-56 pointer-events-none ">
           <Image
             src={semiCircleBlob}
             alt=""

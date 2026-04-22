@@ -24,7 +24,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Bottom Prompt Box */}
-        <div className="relative z-20 w-full px-8 pb-8 flex justify-center">
+        <div className="relative z-20 w-full px-8 pb-20 flex justify-center">
           <Image
             src={promptBox}
             alt="Prompt Example"
@@ -36,7 +36,7 @@ export default function SignUpPage() {
       {/* Right Column - Sign Up Widget */}
       <div className="flex-1 flex items-center justify-center p-4 z-30 bg-black relative overflow-hidden">
         {/* Semicircle Blob - Bottom left */}
-        <div className="absolute bottom-[-1%] left-[-10%] z-0 w-56 h-56 pointer-events-none ">
+        <div className="absolute bottom-[-1%] left-[-15%] md:left-[-10%] lg:left-[-10%]  z-0 w-56 h-56 pointer-events-none ">
           <Image
             src={semiCircleBlob}
             alt=""
@@ -53,6 +53,32 @@ export default function SignUpPage() {
             className="w-full h-full object-contain"
             priority
           />
+        </div>
+
+        {/* Loading skeleton - shown while Clerk JS loads */}
+        <div className="w-full max-w-[420px] relative z-10 has-[.cl-rootBox]:hidden">
+          <div className="flex flex-col items-center gap-5 p-8 animate-pulse">
+            <div className="w-12 h-12 rounded-xl bg-white/10" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-6 w-40 rounded bg-white/10" />
+              <div className="h-4 w-56 rounded bg-white/5" />
+            </div>
+            <div className="w-full h-10 rounded-lg bg-white/10 mt-2" />
+            <div className="flex gap-3 w-full">
+              <div className="flex-1 h-10 rounded-lg bg-white/10" />
+              <div className="flex-1 h-10 rounded-lg bg-white/10" />
+            </div>
+            <div className="flex items-center w-full gap-3">
+              <div className="flex-1 h-px bg-white/10" />
+              <div className="h-4 w-6 rounded bg-white/5" />
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
+            <div className="w-full flex flex-col gap-2">
+              <div className="h-4 w-24 rounded bg-white/10" />
+              <div className="w-full h-10 rounded-lg bg-white/10" />
+            </div>
+            <div className="w-full h-10 rounded-lg bg-white/15" />
+          </div>
         </div>
 
         <SignUp
