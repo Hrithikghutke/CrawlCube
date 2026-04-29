@@ -3,28 +3,28 @@
 import React from "react";
 
 const shimmerStyle = `
-  @keyframes cc-shimmer {
-    0%   { background-position: -400px center; }
-    100% { background-position: 400px center; }
-  }
-  .cc-thinking {
-    background: linear-gradient(
-      90deg,
-      #4b5563 0%,
-      #4b5563 30%,
-      #d1d5db 50%,
-      #4b5563 70%,
-      #4b5563 100%
-    );
-    background-size: 400px 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: cc-shimmer 2s ease-in-out infinite;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-  }
+ @keyframes cc-shimmer {
+ 0% { background-position: -400px center; }
+ 100% { background-position: 400px center; }
+ }
+ .cc-thinking {
+ background: linear-gradient(
+ 90deg,
+ #4b5563 0%,
+ #4b5563 30%,
+ #d1d5db 50%,
+ #4b5563 70%,
+ #4b5563 100%
+ );
+ background-size: 400px 100%;
+ background-clip: text;
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ animation: cc-shimmer 2s ease-in-out infinite;
+ font-size: 13px;
+ font-weight: 500;
+ letter-spacing: 0.01em;
+ }
 `;
 
 export type AgentStatus = "idle" | "running" | "done" | "error";
@@ -40,7 +40,13 @@ export interface AgentStep {
 export function StepIcon({ status }: { status: AgentStatus }) {
   if (status === "done")
     return (
-      <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <svg
+        className="w-3.5 h-3.5 text-emerald-500 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2.5}
+      >
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     );
@@ -55,7 +61,7 @@ export function StepIcon({ status }: { status: AgentStatus }) {
       <div className="w-3.5 h-3.5 shrink-0 rounded-full bg-red-500/20 border border-red-500/50" />
     );
   return (
-    <div className="w-3.5 h-3.5 shrink-0 rounded-full border border-neutral-700" />
+    <div className="w-3.5 h-3.5 shrink-0 rounded-full border border-border" />
   );
 }
 
@@ -100,7 +106,11 @@ export default function ReactGenerationProgress({
 
   // Auto-close developer accordion when all pages compile
   React.useEffect(() => {
-    if (pageSteps.length > 0 && pageSteps.every(p => p.status === 'done') && developerStep?.status === 'done') {
+    if (
+      pageSteps.length > 0 &&
+      pageSteps.every((p) => p.status === "done") &&
+      developerStep?.status === "done"
+    ) {
       const t = setTimeout(() => setDeveloperOpen(false), 2000);
       return () => clearTimeout(t);
     }
@@ -110,134 +120,174 @@ export default function ReactGenerationProgress({
     <div className="space-y-px text-[11px] font-mono w-full">
       {/* ── Architect block ── */}
       {architectStep && (
-        <div className="rounded-lg overflow-hidden border border-neutral-800/60 w-full">
-          <button 
+        <div className="rounded-lg overflow-hidden border border-border/60 w-full">
+          <button
             onClick={() => setArchitectOpen(!architectOpen)}
-            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/5 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-background/5 transition-colors cursor-pointer"
           >
             <StepIcon status={architectStep.status} />
             <span
               className={`font-semibold tracking-wide flex-1 ${
                 architectStep.status === "done"
-                  ? "text-neutral-300"
+                  ? "text-muted-foreground"
                   : architectStep.status === "running"
                     ? "text-blue-300"
                     : architectStep.status === "error"
                       ? "text-red-400"
-                      : "text-neutral-600"
+                      : "text-muted-foreground"
               }`}
             >
               ARCHITECT
             </span>
-            <span className="text-neutral-500 truncate mr-2">
+            <span className="text-muted-foreground truncate mr-2">
               {architectStep.message ?? "Mapping filesystem..."}
             </span>
-            <svg 
-               className={`w-3 h-3 text-neutral-600 transition-transform ${architectOpen ? "rotate-180" : ""}`} 
-               fill="none" 
-               viewBox="0 0 24 24" 
-               stroke="currentColor" 
-               strokeWidth={2}
+            <svg
+              className={`w-3 h-3 text-muted-foreground transition-transform ${architectOpen ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
             >
-               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
           {architectOpen && architectStep.status === "done" && (
-            <div className="px-3 pb-2 pt-1 border-t border-neutral-800/40 bg-[#0a0a0a] text-neutral-400 text-[10px]">
-               <div className="mb-2">
-                 <p className="text-white/40 uppercase tracking-widest mb-1">Architecture Summary</p>
-                 <div className="flex flex-wrap gap-2 text-white/80 font-sans">
-                   {architectData && architectData.brandName && (
-                     <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">{architectData.brandName}</span>
-                   )}
-                   {architectData && architectData.fonts && architectData.fonts.display && (
-                     <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">Font: {architectData.fonts.display}</span>
-                   )}
-                   {architectData && architectData.colors && architectData.colors.primary && (
-                     <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5 flex items-center">
-                       <span className="w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: architectData.colors.primary }} /> Color: {architectData.colors.primary}
-                     </span>
-                   )}
-                 </div>
-               </div>
-               <p className="text-white/40 uppercase tracking-widest mb-1">Component Manifest</p>
-               {architectData && architectData.manifest ? (
-                 <ul className="space-y-1 mt-1">
-                   {Object.keys(architectData.manifest).map(key => (
-                     <li key={key} className="text-white/50 bg-[#151515] px-2 py-1 rounded border border-white/5 truncate max-w-[280px]">
-                       <strong className="text-white/80 mr-1">{key.replace('/components/', '').replace('/pages/', '').replace('.js', '')}:</strong>
-                       <span className="text-[9px] text-white/40 font-mono tracking-tighter">{architectData.manifest[key]}</span>
-                     </li>
-                   ))}
-                 </ul>
-               ) : (
-                 <p>Files defined: {pageSteps.length}</p>
-               )}
+            <div className="px-3 pb-2 pt-1 border-t border-border/40 bg-background text-muted-foreground text-[10px]">
+              <div className="mb-2">
+                <p className="text-foreground/40 uppercase tracking-widest mb-1">
+                  Architecture Summary
+                </p>
+                <div className="flex flex-wrap gap-2 text-foreground/80 font-sans">
+                  {architectData && architectData.brandName && (
+                    <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">
+                      {architectData.brandName}
+                    </span>
+                  )}
+                  {architectData &&
+                    architectData.fonts &&
+                    architectData.fonts.display && (
+                      <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">
+                        Font: {architectData.fonts.display}
+                      </span>
+                    )}
+                  {architectData &&
+                    architectData.colors &&
+                    architectData.colors.primary && (
+                      <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5 flex items-center">
+                        <span
+                          className="w-2 h-2 rounded-sm mr-1"
+                          style={{
+                            backgroundColor: architectData.colors.primary,
+                          }}
+                        />{" "}
+                        Color: {architectData.colors.primary}
+                      </span>
+                    )}
+                </div>
+              </div>
+              <p className="text-foreground/40 uppercase tracking-widest mb-1">
+                Component Manifest
+              </p>
+              {architectData && architectData.manifest ? (
+                <ul className="space-y-1 mt-1">
+                  {Object.keys(architectData.manifest).map((key) => (
+                    <li
+                      key={key}
+                      className="text-foreground/50 bg-[#151515] px-2 py-1 rounded border border-white/5 truncate max-w-[280px]"
+                    >
+                      <strong className="text-foreground/80 mr-1">
+                        {key
+                          .replace("/components/", "")
+                          .replace("/pages/", "")
+                          .replace(".js", "")}
+                        :
+                      </strong>
+                      <span className="text-[9px] text-foreground/40 font-mono tracking-tighter">
+                        {architectData.manifest[key]}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Files defined: {pageSteps.length}</p>
+              )}
             </div>
           )}
         </div>
       )}
 
       {/* ── Developer block ── */}
-      {developerStep && (developerStep.status !== "idle" || pageSteps.length > 0) && (
-          <div className="rounded-lg border border-neutral-800/60 overflow-hidden w-full mt-1">
-            <button 
-               onClick={() => setDeveloperOpen(!developerOpen)}
-               className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/5 transition-colors cursor-pointer"
+      {developerStep &&
+        (developerStep.status !== "idle" || pageSteps.length > 0) && (
+          <div className="rounded-lg border border-border/60 overflow-hidden w-full mt-1">
+            <button
+              onClick={() => setDeveloperOpen(!developerOpen)}
+              className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-background/5 transition-colors cursor-pointer"
             >
               <StepIcon status={developerStep.status} />
               <span
                 className={`font-semibold tracking-wide flex-1 ${
                   developerStep.status === "done"
-                    ? "text-neutral-300"
+                    ? "text-muted-foreground"
                     : developerStep.status === "running"
                       ? "text-blue-300"
-                      : "text-neutral-600"
+                      : "text-muted-foreground"
                 }`}
               >
                 DEVELOPER
               </span>
-              <span className="text-neutral-500 mr-2">
+              <span className="text-muted-foreground mr-2">
                 {developerStep.message ?? "Writing code..."}
               </span>
-              {(pageSteps.length > 0) && (
-                 <svg 
-                    className={`w-3 h-3 text-neutral-600 transition-transform ${developerOpen ? "rotate-180" : ""}`} 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
-                    strokeWidth={2}
-                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                 </svg>
+              {pageSteps.length > 0 && (
+                <svg
+                  className={`w-3 h-3 text-muted-foreground transition-transform ${developerOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               )}
             </button>
 
             {/* Page sub-items */}
             {developerOpen && pageSteps.length > 0 && (
-              <div className="px-3 pb-2 border-t border-neutral-800/40 space-y-0.5 pt-1.5 bg-neutral-900/10">
+              <div className="px-3 pb-2 border-t border-border/40 space-y-0.5 pt-1.5 bg-secondary/10">
                 {pageSteps.map((page) => (
                   <div
                     key={page.id}
                     className="flex justify-between items-center py-0.5 pl-2 group"
                   >
-                     <div className="flex items-center gap-2">
-                        <StepIcon status={page.status} />
-                        <span
+                    <div className="flex items-center gap-2">
+                      <StepIcon status={page.status} />
+                      <span
                         className={`${
-                            page.status === "done"
-                            ? "text-neutral-400"
+                          page.status === "done"
+                            ? "text-muted-foreground"
                             : page.status === "running"
-                                ? "text-blue-300/80"
-                                : "text-neutral-700"
+                              ? "text-blue-300/80"
+                              : "text-foreground"
                         }`}
-                        >
+                      >
                         {page.label}
-                        </span>
-                     </div>
-                     {page.status === 'done' && (
-                         <span className="text-[9px] text-neutral-600 border border-neutral-800 px-1 rounded">Compiled</span>
-                     )}
+                      </span>
+                    </div>
+                    {page.status === "done" && (
+                      <span className="text-[9px] text-muted-foreground border border-border px-1 rounded">
+                        Compiled
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

@@ -101,7 +101,7 @@ export default function Dashboard({ data }: any) {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
 
       <div className="max-w-6xl mx-auto w-full px-6 py-10">
@@ -109,14 +109,15 @@ export default function Dashboard({ data }: any) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold">My Websites</h1>
-            <p className="text-sm text-neutral-500 mt-1">
-              {generations.length} site{generations.length !== 1 ? "s" : ""}{" "}
+            <p className="text-sm text-muted-foreground mt-1">
+              {generations.length} site{generations.length !== 1 ? "s" : ""}
+              {""}
               generated
             </p>
           </div>
           <Link
             href="/"
-            className="flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
           >
             <Plus className="w-4 h-4" />
             New Website
@@ -126,23 +127,23 @@ export default function Dashboard({ data }: any) {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-24">
-            <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
         {/* Empty state */}
         {!loading && generations.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center">
-              <Layers className="w-7 h-7 text-neutral-400 dark:text-neutral-600" />
+            <div className="w-16 h-16 rounded-2xl bg-secondary/10 border border-border flex items-center justify-center">
+              <Layers className="w-7 h-7 text-muted-foreground" />
             </div>
-            <p className="text-neutral-400 font-medium">No websites yet</p>
-            <p className="text-neutral-600 text-sm">
+            <p className="text-muted-foreground font-medium">No websites yet</p>
+            <p className="text-muted-foreground/80 text-sm">
               Generate your first website to see it here
             </p>
             <Link
               href="/"
-              className="mt-2 flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
+              className="mt-2 flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
             >
               <Plus className="w-4 h-4" />
               Build your first site
@@ -161,15 +162,20 @@ export default function Dashboard({ data }: any) {
               return (
                 <div
                   key={gen.id}
-                  className="group relative bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-500 transition-all duration-300 flex flex-col h-[280px]"
+                  className="group relative bg-background border border-border rounded-2xl overflow-hidden hover:border-foreground/30 transition-all duration-300 flex flex-col h-[280px]"
                 >
                   {/* Background Live Thumbnail Setup */}
                   <div className="absolute inset-0 z-0 overflow-hidden mix-blend-luminosity opacity-40 group-hover:opacity-70 transition-opacity duration-500">
-                    <LiveThumbnail gen={gen} scale={0.3} width={1280} height={896} />
+                    <LiveThumbnail
+                      gen={gen}
+                      scale={0.3}
+                      width={1280}
+                      height={896}
+                    />
                   </div>
 
                   {/* Framework Badge */}
-                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-lg bg-neutral-900/80 text-white text-[10px] font-bold shadow-lg backdrop-blur-md border border-white/10 transition-transform group-hover:scale-110 origin-left">
+                  <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2 py-1 rounded-lg bg-secondary/80 text-foreground text-[10px] font-bold shadow-lg backdrop-blur-md border border-border transition-transform group-hover:scale-110 origin-left">
                     {gen.mode === "react" ? (
                       <>
                         <Atom className="w-3 h-3 text-blue-400" />
@@ -184,36 +190,35 @@ export default function Dashboard({ data }: any) {
                   </div>
 
                   {/* Heavy dark gradient overlay to ensure text legibility */}
-                  <div className="absolute inset-0 z-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-neutral-950/40 pointer-events-none" />
+                  <div className="absolute inset-0 z-0 bg-linear-to-t from-background via-background/80 to-background/40 pointer-events-none" />
 
                   {/* Foreground Content */}
                   <div className="relative z-10 flex flex-col h-full">
                     {/* Color accent top bar */}
-                 
 
                     <div className="p-5 flex flex-col flex-1">
                       {/* Site name + theme badge + delete */}
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div className="flex items-start gap-2 flex-1 min-w-0">
-                          <h3 className="font-semibold text-white text-base leading-tight truncate">
+                          <h3 className="font-semibold text-foreground text-base leading-tight truncate">
                             {gen.siteName || "Untitled Project"}
                           </h3>
-                        <span
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 mt-0.5"
-                          style={{
-                            background: `${THEME_COLORS[gen.themeStyle] ?? "#6366f1"}22`,
-                            color: THEME_COLORS[gen.themeStyle] ?? "#6366f1",
-                          }}
-                        >
-                          {THEME_LABELS[gen.themeStyle] ?? gen.themeStyle}
-                        </span>
-                      </div>
+                          <span
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 mt-0.5"
+                            style={{
+                              background: `${THEME_COLORS[gen.themeStyle] ?? "#6366f1"}22`,
+                              color: THEME_COLORS[gen.themeStyle] ?? "#6366f1",
+                            }}
+                          >
+                            {THEME_LABELS[gen.themeStyle] ?? gen.themeStyle}
+                          </span>
+                        </div>
 
-                      {/* Delete button */}
+                        {/* Delete button */}
                         <button
                           onClick={() => handleDelete(gen.id)}
                           disabled={deletingId === gen.id}
-                          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-400/10 transition-all cursor-pointer disabled:opacity-40"
+                          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-400/10 transition-all cursor-pointer disabled:opacity-40"
                           title="Delete"
                         >
                           {deletingId === gen.id ? (
@@ -229,12 +234,12 @@ export default function Dashboard({ data }: any) {
                         {promptText ? (
                           <>
                             <div
-                              className={`text-xs text-neutral-300 leading-relaxed ${
+                              className={`text-xs text-foreground/80 leading-relaxed ${
                                 !isExpanded && isLong
                                   ? "line-clamp-2"
                                   : isExpanded
-                                  ? "max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 pr-1"
-                                  : ""
+                                    ? "max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-foreground/20 pr-1"
+                                    : ""
                               }`}
                             >
                               {promptText}
@@ -244,7 +249,7 @@ export default function Dashboard({ data }: any) {
                                 onClick={() =>
                                   setExpandedPrompt(isExpanded ? null : gen.id)
                                 }
-                                className="flex items-center gap-1 text-[11px] text-neutral-400 hover:text-white mt-1 transition-colors cursor-pointer"
+                                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground mt-1 transition-colors cursor-pointer"
                               >
                                 {isExpanded ? (
                                   <>
@@ -261,7 +266,7 @@ export default function Dashboard({ data }: any) {
                             )}
                           </>
                         ) : (
-                          <div className="text-xs text-neutral-500 italic">
+                          <div className="text-xs text-muted-foreground italic">
                             No prompt recorded
                           </div>
                         )}
@@ -271,36 +276,39 @@ export default function Dashboard({ data }: any) {
                       <div className="flex-1" />
 
                       {/* Date */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-neutral-400 mb-4">
+                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-4">
                         <Clock className="w-3 h-3" />
                         {formatDate(gen.createdAt)}
                       </div>
 
                       {/* Actions */}
                       <div className="flex flex-col gap-2 relative">
-                      {/* Continue editing — full width primary action */}
-                      <Link
-                        href={gen.mode === "react" ? `/react-builder?continue=${gen.id}` : `/build?continue=${gen.id}`}
-                        className="w-full text-center text-xs font-semibold py-2 rounded-lg transition-all"
-                        style={{
-                          background:
-                            gen.themeStyle === "deep-dive"
-                              ? "linear-gradient(90deg,#6366f122,#ec489922)"
-                              : "#7c3aed22",
-                          color:
-                            gen.themeStyle === "deep-dive"
-                              ? "#ec4899"
-                              : "#a78bfa",
-                          border: `1px solid ${gen.themeStyle === "deep-dive" ? "#ec489933" : "#7c3aed33"}`,
-                        }}
-                      >
-                        ✦ Continue Editing
-                      </Link>
+                        {/* Continue editing — full width primary action */}
+                        <Link
+                          href={
+                            gen.mode === "react"
+                              ? `/react-builder?continue=${gen.id}`
+                              : `/build?continue=${gen.id}`
+                          }
+                          className="w-full text-center text-xs font-semibold py-2 rounded-lg transition-all"
+                          style={{
+                            background:
+                              gen.themeStyle === "deep-dive"
+                                ? "linear-gradient(90deg,var(--primary))"
+                                : "var(--primary)",
+                            color:
+                              gen.themeStyle === "deep-dive"
+                                ? "#FFFFFF"
+                                : "#FFFFFF",
+                          }}
+                        >
+                          ✦ Continue Editing
+                        </Link>
                         <div className="flex gap-2">
                           <Link
                             href={`/preview/${gen.shareId}`}
                             target="_blank"
-                            className="flex-1 flex items-center justify-center text-xs font-semibold py-2 rounded-lg bg-neutral-800/80 hover:bg-neutral-700/80 text-white backdrop-blur-sm transition-all"
+                            className="flex-1 flex items-center justify-center text-xs font-semibold py-2 rounded-lg bg-secondary/80 hover:bg-secondary text-foreground backdrop-blur-sm transition-all"
                           >
                             View
                           </Link>
@@ -309,7 +317,7 @@ export default function Dashboard({ data }: any) {
                             className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2 rounded-lg transition-all cursor-pointer backdrop-blur-sm ${
                               copiedId === gen.shareId
                                 ? "bg-green-500/20 text-green-400 border border-green-500/20"
-                                : "bg-neutral-800/80 text-white hover:bg-neutral-700/80 border border-transparent"
+                                : "bg-secondary/80 text-foreground hover:bg-secondary border border-transparent"
                             }`}
                           >
                             <Share2 className="w-3 h-3" />

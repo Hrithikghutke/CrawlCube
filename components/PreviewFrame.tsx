@@ -95,7 +95,7 @@ export default function PreviewFrame({
   return (
     <BrandContext.Provider value={brandContextValue}>
       <div
-        className={`preview-root @container ${isThumbnail ? "min-h-full" : "min-h-screen"} ${layout.theme === "dark" ? "bg-black text-white" : "bg-white text-black"}`}
+        className={`preview-root @container ${isThumbnail ? "min-h-full" : "min-h-screen"} ${layout.theme === "dark" ? "bg-background text-foreground" : "bg-background text-black"}`}
       >
         {/* Developer Agent Google Font */}
         {layout.customFont?.url && (
@@ -107,34 +107,34 @@ export default function PreviewFrame({
           <style dangerouslySetInnerHTML={{ __html: layout.customCss }} />
         )}
 
-        {/* Font enforcement — must come AFTER customCss and uses !important
-            to override Tailwind utility classes like font-serif, font-normal etc. */}
+        {/* Font enforcement — must come AFTER customCss and uses important!
+ to override Tailwind utility classes like font-serif, font-normal etc. */}
         {layout.customFont && (
           <style
             dangerouslySetInnerHTML={{
               __html: `
-            .preview-root h1,
-            .preview-root h2,
-            .preview-root h3,
-            .preview-root h4,
-            .preview-root h5,
-            .preview-root h6 {
-              font-family: ${layout.customFont.displayFamily} !important;
-              font-weight: revert !important;
-            }
-            .preview-root nav,
-            .preview-root footer,
-            .preview-root p,
-            .preview-root a,
-            .preview-root button,
-            .preview-root li,
-            .preview-root input,
-            .preview-root textarea,
-            .preview-root label {
-              font-family: ${layout.customFont.bodyFamily} !important;
-              font-weight: revert !important;
-            }
-          `,
+ .preview-root h1,
+ .preview-root h2,
+ .preview-root h3,
+ .preview-root h4,
+ .preview-root h5,
+ .preview-root h6 {
+ font-family: ${layout.customFont.displayFamily} important!;
+ font-weight: revert important!;
+ }
+ .preview-root nav,
+ .preview-root footer,
+ .preview-root p,
+ .preview-root a,
+ .preview-root button,
+ .preview-root li,
+ .preview-root input,
+ .preview-root textarea,
+ .preview-root label {
+ font-family: ${layout.customFont.bodyFamily} important!;
+ font-weight: revert important!;
+ }
+ `,
             }}
           />
         )}

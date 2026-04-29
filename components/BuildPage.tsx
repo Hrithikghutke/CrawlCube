@@ -166,7 +166,7 @@ export default function BuildPage() {
     if (storedDeepHtml) {
       setDeepHtml(storedDeepHtml);
     }
-    
+
     // Restore savedId to prevent duplicate saves on refresh
     const storedSavedId = sessionStorage.getItem("crawlcube_savedId");
     if (storedSavedId) {
@@ -177,7 +177,7 @@ export default function BuildPage() {
   }, [router, searchParams]);
 
   // Block browser close/refresh when there's unsaved work
-  const hasUnsavedWork = !!(deepHtml || layout) && !isSaved;
+  const hasUnsavedWork = !!(deepHtml || layout) && isSaved!;
 
   useEffect(() => {
     if (!hasUnsavedWork) return;
@@ -286,16 +286,16 @@ export default function BuildPage() {
 
   if (!ready) {
     return (
-      <div className="h-screen flex flex-col bg-white dark:bg-[#111111] transition-colors">
+      <div className="h-screen flex flex-col bg-background transition-colors">
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+          <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <main className="h-screen flex flex-col bg-white dark:bg-[#111111] text-neutral-900 dark:text-white overflow-hidden transition-colors">
+    <main className="h-screen flex flex-col bg-background text-foreground overflow-hidden transition-colors">
       {/* ── Leave confirmation modal ── */}
       {/* ── Leave confirmation modal ── */}
       {showLeaveModal && (
@@ -306,10 +306,7 @@ export default function BuildPage() {
             backdropFilter: "blur(6px)",
           }}
         >
-          <div
-            className="w-full max-w-sm mx-4 rounded-3xl border border-neutral-800 overflow-hidden"
-            style={{ background: "#141414" }}
-          >
+          <div className="w-full max-w-sm mx-4 rounded-3xl border border-border overflow-hidden bg-background shadow-2xl">
             {/* Illustration area */}
             <div
               className="relative flex items-center justify-center py-10"
@@ -338,9 +335,11 @@ export default function BuildPage() {
                 className="relative w-20 h-20 rounded-2xl flex items-center justify-center"
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(236,72,153,0.20))",
-                  border: "1px solid rgba(168,85,247,0.3)",
-                  boxShadow: "0 0 40px rgba(168,85,247,0.2)",
+                    "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 25%, transparent), rgba(236,72,153,0.20))",
+                  border:
+                    "1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)",
+                  boxShadow:
+                    "0 0 40px color-mix(in srgb, var(--color-primary) 20%, transparent)",
                 }}
               >
                 <svg
@@ -361,7 +360,7 @@ export default function BuildPage() {
                       x2="100%"
                       y2="100%"
                     >
-                      <stop offset="0%" stopColor="#c084fc" />
+                      <stop offset="0%" stopColor="var(--color-primary)" />
                       <stop offset="100%" stopColor="#f472b6" />
                     </linearGradient>
                   </defs>
@@ -393,10 +392,10 @@ export default function BuildPage() {
                 </svg>
               </button>
               <div className="space-y-2 text-center">
-                <h2 className="text-base font-semibold text-neutral-100 tracking-tight">
+                <h2 className="text-base font-semibold text-foreground tracking-tight">
                   Save your work?
                 </h2>
-                <p className="text-xs text-neutral-500 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Your generated website will be lost if you leave without
                   saving it to your dashboard.
                 </p>
@@ -408,12 +407,7 @@ export default function BuildPage() {
                     triggerSaveRef.current?.();
                     setShowLeaveModal(false);
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all"
-                  style={{
-                    background: "linear-gradient(135deg, #a855f7, #ec4899)",
-                    color: "#fff",
-                    boxShadow: "0 4px 20px rgba(168,85,247,0.3)",
-                  }}
+                  className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_4px_20px_var(--color-primary)] opacity-80 hover:opacity-100"
                 >
                   Stay and save
                 </button>
@@ -426,7 +420,7 @@ export default function BuildPage() {
                     if (pendingNavRef.current)
                       router.push(pendingNavRef.current);
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl text-xs font-medium cursor-pointer transition-all text-neutral-500 hover:text-neutral-300 tracking-wide uppercase"
+                  className="w-full px-4 py-2.5 rounded-xl text-xs font-medium cursor-pointer transition-all text-muted-foreground hover:text-foreground tracking-wide uppercase"
                 >
                   Quit without saving
                 </button>
@@ -457,7 +451,9 @@ export default function BuildPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* DESKTOP */}
-        <div className={`${showChatPanel ? 'hidden md:flex w-[38%]' : 'hidden'} shrink-0 border-r border-neutral-200 dark:border-neutral-800 flex-col transition-all duration-300 ease-in-out`}>
+        <div
+          className={`${showChatPanel ? "hidden md:flex w-[38%]" : "hidden"} shrink-0 border-r border-border flex-col transition-all duration-300 ease-in-out`}
+        >
           <ChatPanel
             setLayout={handleChatGenerate}
             setDeepHtml={handleDeepHtml}
@@ -472,7 +468,7 @@ export default function BuildPage() {
           />
         </div>
 
-        <div className="hidden md:flex flex-1 flex-col min-w-0 bg-neutral-50 dark:bg-[#0a0a0a]">
+        <div className="hidden md:flex flex-1 flex-col min-w-0 bg-background">
           <PreviewPanel
             layout={layout}
             deepHtml={deepHtml}
@@ -514,10 +510,10 @@ export default function BuildPage() {
             />
           ) : (
             <div className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#111111] border-b border-transparent dark:border-white/5">
+              <div className="flex items-center justify-between px-4 py-3 bg-background border-b border-border">
                 <button
                   onClick={() => setMobileView("chat")}
-                  className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 text-sm text-foreground transition-colors cursor-pointer"
                 >
                   <svg
                     className="w-4 h-4"
@@ -534,9 +530,7 @@ export default function BuildPage() {
                   </svg>
                   Back to chat
                 </button>
-                <span className="text-sm text-neutral-700 dark:text-neutral-200">
-                  Preview
-                </span>
+                <span className="text-sm text-foreground">Preview</span>
               </div>
               <PreviewPanel
                 layout={layout}

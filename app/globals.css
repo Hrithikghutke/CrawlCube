@@ -2,24 +2,143 @@
 @plugin "tailwind-scrollbar";
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --scrollbar-track: transparent;
-  --scrollbar-thumb: #d4d4d8; /* neutral-300 */
-  --scrollbar-thumb-hover: #a1a1aa; /* neutral-400 */
+html {
+  scroll-behavior: smooth;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+@layer utilities {
+  .bg-zigzag-pattern {
+    --s: 64px; /* control the size */
+    --c1: #ffffff;
+    --c2: #fafafa;
+    --_g: 90deg, #0000 0;
+
+    background:
+      conic-gradient(from 135deg, var(--c1) var(--_g)) var(--s)
+        calc(var(--s) / 2),
+      conic-gradient(from 135deg, var(--c2) var(--_g)),
+      conic-gradient(from 135deg at 50% 0, var(--c1) var(--_g)) var(--c2);
+    background-size: calc(2 * var(--s)) var(--s);
+  }
+}
+
+/* ============================================================
+   🎨 BRAND PALETTE — Edit ONLY this block to retheme the app
+   ============================================================
+   Each token has a light and dark variant.
+   Change colors here → entire app updates automatically.
+   ============================================================ */
+:root {
+  /* Background & Foreground */
+  --brand-background: #ffffff; /* ← Light background */
+  --brand-background-dark: #000000; /* ← Dark background  */
+  --brand-foreground: #000000; /* ← Light text color  */
+  --brand-foreground-dark: #f8fafc; /* ← Dark text color   */
+
+  /* Primary: Main brand color (buttons, active states, links) */
+  --brand-primary: #8b79af;
+  --brand-primary-dark: #8b79af;
+  --brand-primary-foreground: #ffffff;
+  --brand-primary-foreground-dark: #ffffff;
+
+  /* Secondary: Complementary panels, cards, subtle fills */
+  --brand-secondary: #f1f5f9;
+  --brand-secondary-dark: #1e293b;
+  --brand-secondary-foreground: #0f172a;
+  --brand-secondary-foreground-dark: #f8fafc;
+
+  /* Accent: Highlights, hover states, badges */
+  --brand-accent: #f8fafc;
+  --brand-accent-dark: #507abf;
+  --brand-accent-foreground: #0f172a;
+  --brand-accent-foreground-dark: #f8fafc;
+
+  /* Muted: Disabled states, placeholder text, subtle labels */
+  --brand-muted: #f1f5f9;
+  --brand-muted-dark: #1e293b;
+  --brand-muted-foreground: #64748b;
+  --brand-muted-foreground-dark: #94a3b8;
+
+  /* Border, Input outline, Focus ring */
+  --brand-border: #e2e8f0;
+  --brand-border-dark: #1e293b;
+  --brand-input: #e2e8f0;
+  --brand-input-dark: #1e293b;
+  --brand-ring: #226ec4;
+  --brand-ring-dark: #226ec4;
+
+  /* Scrollbar */
+  --brand-scrollbar-thumb: #d4d4d8;
+  --brand-scrollbar-thumb-dark: #3f3f46;
+  --brand-scrollbar-thumb-hover: #a1a1aa;
+  --brand-scrollbar-thumb-hover-dark: #52525b;
+
+  /* ── Typography ── */
+  /* To change fonts:
+     1. Update the <link> URL in layout.tsx <head>
+     2. Update font names in @theme block (--font-sans, --font-heading)
+     3. Update font-family in body {} rule
+     Current: Satoshi (body) + Clash Display (headings) from Fontshare */
+}
+
+/* ============================================================
+   LIGHT THEME  (auto-wired from brand palette)
+   ============================================================ */
+:root {
+  --background: var(--brand-background);
+  --foreground: var(--brand-foreground);
+
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--brand-primary-foreground);
+
+  --secondary: var(--brand-secondary);
+  --secondary-foreground: var(--brand-secondary-foreground);
+
+  --accent: var(--brand-accent);
+  --accent-foreground: var(--brand-accent-foreground);
+
+  --muted: var(--brand-muted);
+  --muted-foreground: var(--brand-muted-foreground);
+
+  --border: var(--brand-border);
+  --input: var(--brand-input);
+  --ring: var(--brand-ring);
+  --radius: 0.5rem;
+
   --scrollbar-track: transparent;
-  --scrollbar-thumb: #3f3f46; /* neutral-700 */
-  --scrollbar-thumb-hover: #52525b; /* neutral-600 */
+  --scrollbar-thumb: var(--brand-scrollbar-thumb);
+  --scrollbar-thumb-hover: var(--brand-scrollbar-thumb-hover);
+}
+
+/* ============================================================
+   DARK THEME  (.dark class — set by next-themes)
+   ============================================================ */
+.dark {
+  --background: var(--brand-background-dark);
+  --foreground: var(--brand-foreground-dark);
+
+  --primary: var(--brand-primary-dark);
+  --primary-foreground: var(--brand-primary-foreground-dark);
+
+  --secondary: var(--brand-secondary-dark);
+  --secondary-foreground: var(--brand-secondary-foreground-dark);
+
+  --accent: var(--brand-accent-dark);
+  --accent-foreground: var(--brand-accent-foreground-dark);
+
+  --muted: var(--brand-muted-dark);
+  --muted-foreground: var(--brand-muted-foreground-dark);
+
+  --border: var(--brand-border-dark);
+  --input: var(--brand-input-dark);
+  --ring: var(--brand-ring-dark);
+
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: var(--brand-scrollbar-thumb-dark);
+  --scrollbar-thumb-hover: var(--brand-scrollbar-thumb-hover-dark);
 }
 
 @layer base {
-  /* Chrome, Safari, and Edge */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -35,43 +154,78 @@
     background: var(--scrollbar-thumb-hover);
   }
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  /* Apply thin textareas scrollbar globally mostly for Firefox */
   textarea {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   }
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* 🔤 Fonts — change these to swap typography app-wide */
+  --font-sans: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Clash Display", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Boska", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ============================================================
+   OS-LEVEL DARK MODE (fallback for users without .dark class)
+   ============================================================ */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--brand-background-dark);
+    --foreground: var(--brand-foreground-dark);
+    --primary: var(--brand-primary-dark);
+    --primary-foreground: var(--brand-primary-foreground-dark);
+    --secondary: var(--brand-secondary-dark);
+    --secondary-foreground: var(--brand-secondary-foreground-dark);
+    --accent: var(--brand-accent-dark);
+    --accent-foreground: var(--brand-accent-foreground-dark);
+    --muted: var(--brand-muted-dark);
+    --muted-foreground: var(--brand-muted-foreground-dark);
+    --border: var(--brand-border-dark);
+    --input: var(--brand-input-dark);
+    --ring: var(--brand-ring-dark);
     --scrollbar-track: transparent;
-    --scrollbar-thumb: #3f3f46;
-    --scrollbar-thumb-hover: #52525b;
+    --scrollbar-thumb: var(--brand-scrollbar-thumb-dark);
+    --scrollbar-thumb-hover: var(--brand-scrollbar-thumb-hover-dark);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Satoshi", ui-sans-serif, system-ui, sans-serif;
 }

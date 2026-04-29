@@ -26,8 +26,15 @@ export interface ReactMessage {
   createdAt: Date;
 }
 
-
-function QuestionCards({ intro, questions, onSubmit }: { intro: string; questions: { id: string; text: string; options: string[] }[]; onSubmit: (answers: string) => void; }) {
+function QuestionCards({
+  intro,
+  questions,
+  onSubmit,
+}: {
+  intro: string;
+  questions: { id: string; text: string; options: string[] }[];
+  onSubmit: (answers: string) => void;
+}) {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [customInputs, setCustomInputs] = useState<Record<string, string>>({});
@@ -50,55 +57,97 @@ function QuestionCards({ intro, questions, onSubmit }: { intro: string; question
   };
 
   const handleDone = () => {
-    const compiled = questions.map((q) => {
-      const ans = answers[q.id] || customInputs[q.id] || "";
-      return `${q.text} ${ans}`;
-    }).join(" ");
+    const compiled = questions
+      .map((q) => {
+        const ans = answers[q.id] || customInputs[q.id] || "";
+        return `${q.text} ${ans}`;
+      })
+      .join("");
     onSubmit(compiled);
   };
 
   return (
     <div className="space-y-3">
-      {intro && <p className="text-[13px] text-neutral-300 px-1 leading-relaxed">{intro}</p>}
-      <div className="rounded-xl border border-neutral-800 overflow-hidden" style={{ background: "rgba(255,255,255,0.02)" }}>
-        <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-800/60">
-          <span className="text-[11px] font-mono text-neutral-600 tracking-widest uppercase">{page + 1} / {total}</span>
+      {intro && (
+        <p className="text-[13px] text-muted-foreground px-1 leading-relaxed">
+          {intro}
+        </p>
+      )}
+      <div
+        className="rounded-xl border border-border overflow-hidden"
+        style={{ background: "rgba(255,255,255,0.02)" }}
+      >
+        <div className="flex items-center justify-between px-3 py-2 border-b border-border/60">
+          <span className="text-[11px] font-mono text-muted-foreground tracking-widest uppercase">
+            {page + 1} / {total}
+          </span>
         </div>
         <div className="px-3 py-3 space-y-2.5">
-          <p className="text-[13px] text-neutral-200 font-medium leading-snug">{current.text}</p>
+          <p className="text-[13px] text-foreground font-medium leading-snug">
+            {current.text}
+          </p>
           <div className="flex flex-wrap gap-1.5">
             {current.options.map((opt) => {
-              const isSelected = currentAnswer === opt || (opt === "Other" && showCustom[current.id]);
+              const isSelected =
+                currentAnswer === opt ||
+                (opt === "Other" && showCustom[current.id]);
               return (
                 <button
                   key={opt}
                   onClick={() => pickOption(current.id, opt)}
                   className="px-3 py-1.5 rounded-lg text-[12px] font-medium border transition-all cursor-pointer"
                   style={{
-                    background: isSelected ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.03)",
+                    background: isSelected
+                      ? "rgba(168,85,247,0.15)"
+                      : "rgba(255,255,255,0.03)",
                     borderColor: isSelected ? "#a855f7" : "#2a2a2a",
                     color: isSelected ? "#d8b4fe" : "#737373",
                   }}
-                >{opt}</button>
+                >
+                  {opt}
+                </button>
               );
             })}
           </div>
           {showCustom[current.id] && (
             <input
-              autoFocus type="text" placeholder="Describe your preference..." value={customInputs[current.id] ?? ""}
+              autoFocus
+              type="text"
+              placeholder="Describe your preference..."
+              value={customInputs[current.id] ?? ""}
               onChange={(e) => {
-                setCustomInputs((p) => ({ ...p, [current.id]: e.target.value }));
+                setCustomInputs((p) => ({
+                  ...p,
+                  [current.id]: e.target.value,
+                }));
                 setAnswers((p) => ({ ...p, [current.id]: e.target.value }));
               }}
-              className="w-full bg-transparent border border-neutral-700 focus:border-purple-500/60 rounded-lg px-3 py-2 text-[12px] text-neutral-200 outline-none mt-2"
+              className="w-full bg-transparent border border-border focus:border-primary/60 rounded-lg px-3 py-2 text-[12px] text-foreground outline-none mt-2"
             />
           )}
         </div>
         <div className="px-3 pb-3 flex justify-between items-center">
           {!isLastPage ? (
-            <button onClick={() => setPage((p) => p + 1)} disabled={!currentAnswer} className="ml-auto px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#d8b4fe] bg-[#a855f726] border border-[#a855f740] disabled:opacity-30">Next</button>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!currentAnswer}
+              className="ml-auto px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#d8b4fe] bg-[#a855f726] border border-[#a855f740] disabled:opacity-30"
+            >
+              Next
+            </button>
           ) : (
-            <button onClick={handleDone} disabled={!allAnswered} className="ml-auto px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white disabled:opacity-30" style={{ background: allAnswered ? "linear-gradient(135deg, #a855f7, #ec4899)" : "rgba(168,85,247,0.1)" }}>Done</button>
+            <button
+              onClick={handleDone}
+              disabled={!allAnswered}
+              className="ml-auto px-3 py-1.5 rounded-lg text-[12px] font-semibold text-foreground disabled:opacity-30"
+              style={{
+                background: allAnswered
+                  ? "linear-gradient(135deg, #a855f7, #ec4899)"
+                  : "rgba(168,85,247,0.1)",
+              }}
+            >
+              Done
+            </button>
           )}
         </div>
       </div>
@@ -115,7 +164,11 @@ export default function ReactChatPanel({
   onFilesChange: (files: GeneratedReactFiles | null) => void;
   initialPrompt?: string;
   initialFiles?: GeneratedReactFiles | null;
-  onGenerationStateChange?: (isGenerating: boolean, steps: any[], architectData?: any) => void;
+  onGenerationStateChange?: (
+    isGenerating: boolean,
+    steps: any[],
+    architectData?: any,
+  ) => void;
 }) {
   const [messages, setMessages] = useState<ReactMessage[]>(() => {
     if (initialFiles && initialPrompt) {
@@ -153,17 +206,21 @@ export default function ReactChatPanel({
     try {
       const stored = sessionStorage.getItem("crawlcube_react_messages");
       if (stored) {
-        setMessages(JSON.parse(stored).map((m: any) => ({
-          ...m,
-          createdAt: new Date(m.createdAt),
-        })));
+        setMessages(
+          JSON.parse(stored).map((m: any) => ({
+            ...m,
+            createdAt: new Date(m.createdAt),
+          })),
+        );
       }
     } catch {}
   }, []);
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("anthropic/claude-3.5-sonnet");
+  const [selectedModel, setSelectedModel] = useState(
+    "anthropic/claude-3.5-sonnet",
+  );
 
   useEffect(() => {
     try {
@@ -175,16 +232,19 @@ export default function ReactChatPanel({
   const briefRef = useRef<string>("");
   const hasAutoStarted = useRef(false);
 
-
   useEffect(() => {
     if (onGenerationStateChange && messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg.role === "assistant") {
-         onGenerationStateChange(!!lastMsg.isGenerating, lastMsg.agentSteps || [], lastMsg.architectData);
+        onGenerationStateChange(
+          !!lastMsg.isGenerating,
+          lastMsg.agentSteps || [],
+          lastMsg.architectData,
+        );
       }
     }
   }, [messages, onGenerationStateChange]);
-  
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -192,8 +252,8 @@ export default function ReactChatPanel({
   useEffect(() => {
     if (
       initialPrompt &&
-      !initialFiles &&
-      !hasAutoStarted.current &&
+      initialFiles! &&
+      hasAutoStarted!.current &&
       messages.length <= 1
     ) {
       hasAutoStarted.current = true;
@@ -210,7 +270,10 @@ export default function ReactChatPanel({
     }
   }, [messages]);
 
-  const handleSend = async (customPrompt?: string, isAutoStart: boolean = false) => {
+  const handleSend = async (
+    customPrompt?: string,
+    isAutoStart: boolean = false,
+  ) => {
     const text = (customPrompt || input).trim();
     if (!text || loading) return;
 
@@ -222,7 +285,9 @@ export default function ReactChatPanel({
     };
     const aiMsgId = crypto.randomUUID();
 
-    const lastSnapshot = [...messages].reverse().find((m) => m.snapshotFiles)?.snapshotFiles;
+    const lastSnapshot = [...messages]
+      .reverse()
+      .find((m) => m.snapshotFiles)?.snapshotFiles;
 
     if (!isAutoStart) {
       setMessages((prev) => [...prev, userMsg]);
@@ -242,7 +307,9 @@ export default function ReactChatPanel({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: messages.concat(userMsg).map((m) => ({ role: m.role, content: m.content })),
+            messages: messages
+              .concat(userMsg)
+              .map((m) => ({ role: m.role, content: m.content })),
             brief: briefRef.current,
             hasExistingWebsite: !!lastSnapshot,
           }),
@@ -310,7 +377,7 @@ export default function ReactChatPanel({
           buffer = parts.pop() || "";
 
           for (const line of parts) {
-            if (line.startsWith("data: ")) {
+            if (line.startsWith("data:")) {
               try {
                 const data = JSON.parse(line.slice(6));
 
@@ -320,13 +387,20 @@ export default function ReactChatPanel({
                       if (m.id === aiMsgId) {
                         const steps = m.agentSteps || [];
                         const existing = [...steps];
-                        const idx = existing.findIndex((s) => s.id === data.step.id);
-                        if (idx >= 0) existing[idx] = { ...existing[idx], ...data.step };
+                        const idx = existing.findIndex(
+                          (s) => s.id === data.step.id,
+                        );
+                        if (idx >= 0)
+                          existing[idx] = { ...existing[idx], ...data.step };
                         else existing.push(data.step);
-                        return { ...m, agentSteps: existing, architectData: data.architectData || m.architectData };
+                        return {
+                          ...m,
+                          agentSteps: existing,
+                          architectData: data.architectData || m.architectData,
+                        };
                       }
                       return m;
-                    })
+                    }),
                   );
                 } else if (data.action === "generation-complete") {
                   finalFiles = data.files;
@@ -340,7 +414,8 @@ export default function ReactChatPanel({
         }
       }
 
-      if (!finalFiles) throw new Error("Stream closed before files were generated.");
+      if (!finalFiles)
+        throw new Error("Stream closed before files were generated.");
 
       const v = [...messages].filter((m) => m.snapshotFiles).length + 1;
 
@@ -352,26 +427,41 @@ export default function ReactChatPanel({
               content: "Generated React components based on your request.",
               snapshotFiles: finalFiles,
               snapshotVersion: v,
-              tokens: finalTokens ? { input: finalTokens.inputTokens || 0, output: finalTokens.outputTokens || 0, total: (finalTokens.inputTokens || 0) + (finalTokens.outputTokens || 0), credits: finalTokens.creditsUsed || 0 } : undefined,
+              tokens: finalTokens
+                ? {
+                    input: finalTokens.inputTokens || 0,
+                    output: finalTokens.outputTokens || 0,
+                    total:
+                      (finalTokens.inputTokens || 0) +
+                      (finalTokens.outputTokens || 0),
+                    credits: finalTokens.creditsUsed || 0,
+                  }
+                : undefined,
               model: selectedModel,
               isGenerating: false,
             };
           }
           return m;
-        })
+        }),
       );
 
-      sessionStorage.setItem("crawlcube_react_files", JSON.stringify(finalFiles));
+      sessionStorage.setItem(
+        "crawlcube_react_files",
+        JSON.stringify(finalFiles),
+      );
       onFilesChange(finalFiles);
     } catch (err: any) {
       setMessages((prev) =>
-        prev.map((m) => (m.id === aiMsgId ? { ...m, content: `❌ Error: ${err.message}`, isGenerating: false } : m))
+        prev.map((m) =>
+          m.id === aiMsgId
+            ? { ...m, content: `❌ Error: ${err.message}`, isGenerating: false }
+            : m,
+        ),
       );
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleRestore = (files: GeneratedReactFiles) => {
     onFilesChange(files);
@@ -389,9 +479,9 @@ export default function ReactChatPanel({
   return (
     <div className="w-full md:w-[350px] shrink-0 md:border-r border-[#222] bg-[#0f0f0f] flex flex-col h-full overflow-hidden text-sm">
       {/* Header */}
-      <div className="p-4 border-b border-[#222] shrink-0 bg-[#0a0a0a]">
-        <div className="flex items-center gap-2 font-semibold text-white">
-          React Generation{" "}
+      <div className="p-4 border-b border-[#222] shrink-0 bg-background">
+        <div className="flex items-center gap-2 font-semibold text-foreground">
+          React Generation{""}
           <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] px-1.5 py-0.5 rounded tracking-wider uppercase">
             BETA
           </span>
@@ -406,17 +496,31 @@ export default function ReactChatPanel({
             className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
           >
             {m.role === "user" ? (
-              <div className="bg-indigo-600/90 text-white px-4 py-2.5 rounded-2xl max-w-[90%] break-words">
+              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] text-wrap">
                 {m.content}
                 {m.questions && m.questions.length > 0 && (
-                  <div className="mt-4"><QuestionCards intro="" questions={m.questions} onSubmit={(ans) => handleSend(ans)} /></div>
+                  <div className="mt-4">
+                    <QuestionCards
+                      intro=""
+                      questions={m.questions}
+                      onSubmit={(ans) => handleSend(ans)}
+                    />
+                  </div>
                 )}
               </div>
             ) : (
               <div className="w-full">
-                <p className="text-white/80 font-medium mb-3">{m.content}</p>
+                <p className="text-foreground/80 font-medium mb-3">
+                  {m.content}
+                </p>
                 {m.questions && m.questions.length > 0 && (
-                  <div className="my-4"><QuestionCards intro="" questions={m.questions} onSubmit={(ans) => handleSend(ans)} /></div>
+                  <div className="my-4">
+                    <QuestionCards
+                      intro=""
+                      questions={m.questions}
+                      onSubmit={(ans) => handleSend(ans)}
+                    />
+                  </div>
                 )}
 
                 {(m.isGenerating ||
@@ -424,57 +528,60 @@ export default function ReactChatPanel({
                   <div className="bg-[#151515] p-3 rounded-xl border border-white/10 my-3">
                     {m.isGenerating && (
                       <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/5">
-                        <LoaderCircle className="w-4 h-4 text-white/50 animate-spin" />
+                        <LoaderCircle className="w-4 h-4 text-foreground/50 animate-spin" />
                         <ThinkingText label={getThinkingLabel(m.agentSteps)} />
                       </div>
                     )}
                     {m.agentSteps && m.agentSteps.length > 0 && (
-                      <ReactGenerationProgress steps={m.agentSteps} architectData={m.architectData} />
+                      <ReactGenerationProgress
+                        steps={m.agentSteps}
+                        architectData={m.architectData}
+                      />
                     )}
                   </div>
                 )}
 
                 {m.snapshotFiles && (
                   <div className="bg-[#151515] border border-white/10 rounded-xl overflow-hidden mt-2 flex flex-col shadow-xl shadow-black/20">
-                    <div className="bg-white/5 px-3 py-2 border-b border-white/10 flex items-center justify-between text-xs text-white/60">
+                    <div className="bg-background/5 px-3 py-2 border-b border-white/10 flex items-center justify-between text-xs text-foreground/60">
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5" />
-                        <span className="font-semibold tracking-wider text-white">
+                        <span className="font-semibold tracking-wider text-foreground">
                           SNAPSHOT
                         </span>
                         <span className="bg-indigo-500/20 text-indigo-400 px-1.5 rounded-full font-mono">
                           v{m.snapshotVersion}
                         </span>
                       </div>
-                      <span className="font-mono bg-white/5 px-1.5 rounded">
+                      <span className="font-mono bg-background/5 px-1.5 rounded">
                         {Object.keys(m.snapshotFiles).length} files
                       </span>
                     </div>
                     <div className="p-3 grid grid-cols-2 gap-2 text-xs">
-                      <div className="bg-[#0a0a0a] p-2 rounded-lg border border-white/5">
-                        <p className="text-white/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
+                      <div className="bg-background p-2 rounded-lg border border-white/5">
+                        <p className="text-foreground/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
                           Snapshot
                         </p>
-                        <p className="text-white/80 font-medium">
+                        <p className="text-foreground/80 font-medium">
                           Generation Version {m.snapshotVersion}
                         </p>
                       </div>
-                      <div className="bg-[#0a0a0a] p-2 rounded-lg border border-white/5">
-                        <p className="text-white/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
+                      <div className="bg-background p-2 rounded-lg border border-white/5">
+                        <p className="text-foreground/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
                           Framework
                         </p>
-                        <p className="text-white/80 font-medium">React</p>
+                        <p className="text-foreground/80 font-medium">React</p>
                       </div>
-                      <div className="bg-[#0a0a0a] p-2 rounded-lg border border-white/5 col-span-2">
-                        <p className="text-white/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
+                      <div className="bg-background p-2 rounded-lg border border-white/5 col-span-2">
+                        <p className="text-foreground/40 font-mono text-[10px] mb-1 uppercase tracking-widest">
                           Libraries
                         </p>
-                        <p className="text-white/80 font-medium truncate">
+                        <p className="text-foreground/80 font-medium truncate">
                           react, react-dom, react-router-dom, tailwind
                         </p>
                       </div>
                     </div>
-                    <div className="px-3 py-2 bg-[#0a0a0a] border-t border-white/10 text-[11px] text-white/50 flex flex-col gap-2">
+                    <div className="px-3 py-2 bg-background border-t border-white/10 text-[11px] text-foreground/50 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
                         <p>Version {m.snapshotVersion} context active.</p>
                       </div>
@@ -502,7 +609,7 @@ export default function ReactChatPanel({
                           onClick={() =>
                             m.snapshotFiles && handleRestore(m.snapshotFiles)
                           }
-                          className="text-white hover:text-indigo-400 flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
+                          className="text-foreground hover:text-indigo-400 flex items-center gap-1.5 transition-colors cursor-pointer ml-auto"
                         >
                           <RotateCcw className="w-3 h-3" /> Restore version
                         </button>
@@ -518,31 +625,31 @@ export default function ReactChatPanel({
       </div>
 
       {/* Input Form */}
-      <div className="p-4 border-t border-[#222] bg-[#0a0a0a]">
+      <div className="p-4 border-t border-[#222] bg-background">
         <div className="border border-white/10 rounded-xl overflow-hidden bg-[#111] focus-within:border-indigo-500/50 transition-colors flex flex-col">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && e!.shiftKey) {
                 e.preventDefault();
                 handleSend();
               }
             }}
             placeholder="Describe your React project..."
-            className="w-full bg-transparent text-white placeholder-white/30 p-3 min-h-[80px] max-h-[200px] resize-none outline-none overflow-y-auto"
+            className="w-full bg-transparent text-foreground placeholder-white/30 p-3 min-h-[80px] max-h-[200px] resize-none outline-none overflow-y-auto"
           />
           <div className="px-2 py-1.5 bg-[#080808] border-t border-white/5 flex items-center justify-between">
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="bg-transparent text-xs text-white/60 focus:text-white outline-none cursor-pointer max-w-[140px]"
+              className="bg-transparent text-xs text-foreground/60 focus:text-foreground outline-none cursor-pointer max-w-[140px]"
             >
               {MODELS.map((model) => (
                 <option
                   key={model.model}
                   value={model.model}
-                  className="bg-neutral-900 text-white"
+                  className="bg-secondary text-foreground"
                 >
                   {model.label}
                 </option>
@@ -553,7 +660,7 @@ export default function ReactChatPanel({
               <button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || loading}
-                className="w-7 h-7 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-40 transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-500 text-foreground disabled:opacity-40 transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>

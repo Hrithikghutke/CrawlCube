@@ -13,17 +13,19 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return <div className="w-[84px] h-[28px] rounded-full bg-neutral-200 dark:bg-neutral-800" />;
+    return (
+      <div className="w-[84px] h-[28px] rounded-full bg-neutral-200 dark:bg-neutral-800" />
+    );
   }
 
   return (
-    <div className="flex items-center gap-1 p-1 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+    <div className="flex items-center gap-1 p-1 rounded-full bg-neutral-100 dark:bg-neutral-800 border border-border">
       <button
         onClick={() => setTheme("light")}
         className={`p-1 rounded-full transition-colors ${
           theme === "light"
-            ? "bg-white text-black shadow-sm"
-            : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
+            ? "bg-background text-black shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
         }`}
         title="Light Mode"
       >
@@ -34,8 +36,8 @@ export function ThemeToggle() {
         onClick={() => setTheme("dark")}
         className={`p-1 rounded-full transition-colors ${
           theme === "dark"
-            ? "bg-neutral-900 text-white shadow-sm"
-            : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
+            ? "bg-secondary text-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
         }`}
         title="Dark Mode"
       >

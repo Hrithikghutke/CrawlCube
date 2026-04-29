@@ -124,7 +124,7 @@ PREMIUM LAYOUT RULES (MANDATORY — these prevent the broken UIs):
   * Overlines (above section titles): \`text-xs md:text-sm font-semibold uppercase tracking-widest\` in the primary color
 - IMAGE HANDLING: All \`<img>\` tags MUST include: \`className="w-full h-full object-cover"\`, a meaningful \`alt\` attribute, and \`loading="lazy"\`. Wrap images in a container with fixed aspect ratio (\`aspect-video\`, \`aspect-square\`, or explicit height).
 - CONTENT DENSITY: Sections must feel substantial. Features sections need 3-6 items. Stats need 3-4 numbers. Testimonials need 2-3 quotes. NEVER render a section with only 1 item.
-- DO not add \`border-b\` class to Navbar is using scroll down animation.
+- DO not add \`border border-b\` class to Navbar.
 
 PREMIUM AESTHETICS & INTERACTIVITY:
 - Combine DaisyUI primitives with modern design trends: glassmorphism (\`glass\` class), subtle gradients.

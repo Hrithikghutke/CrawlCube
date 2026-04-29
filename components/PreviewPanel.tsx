@@ -5,8 +5,11 @@ import PreviewFrame from "@/components/PreviewFrame";
 import DeepPreview from "@/components/DeepPreview";
 import ElementEditorPanel from "@/components/ui/ElementEditorPanel";
 import { Layout } from "@/types/layout";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import {
+  vscDarkPlus,
+  vs,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
 import html2canvas from "html2canvas";
 
@@ -45,7 +48,8 @@ async function captureThumbnail(html: string): Promise<string | null> {
     try {
       const iframe = document.createElement("iframe");
       // 800x600 fixed iframe off-screen
-      iframe.style.cssText = "position:fixed;left:-9999px;top:0;width:800px;height:600px;opacity:0;pointer-events:none;border:none;";
+      iframe.style.cssText =
+        "position:fixed;left:-9999px;top:0;width:800px;height:600px;opacity:0;pointer-events:none;border:none;";
       document.body.appendChild(iframe);
 
       const idoc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -62,7 +66,7 @@ async function captureThumbnail(html: string): Promise<string | null> {
         try {
           // Small delay for fonts/images to render
           await new Promise((r) => setTimeout(r, 600));
-          
+
           const canvas = await html2canvas(idoc.body, {
             width: 800,
             height: 600,
@@ -71,7 +75,7 @@ async function captureThumbnail(html: string): Promise<string | null> {
             useCORS: true,
             scale: 0.5, // 400x300 output
           });
-          
+
           // Heavy JPEG compression to keep DB payload extremely small (~10kb)
           const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
           document.body.removeChild(iframe);
@@ -82,7 +86,7 @@ async function captureThumbnail(html: string): Promise<string | null> {
           resolve(null);
         }
       };
-      
+
       iframe.onerror = () => {
         if (document.body.contains(iframe)) document.body.removeChild(iframe);
         resolve(null);
@@ -126,18 +130,24 @@ export default function PreviewPanel({
 }) {
   const { resolvedTheme } = useTheme();
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
-  const [editorActiveTab, setEditorActiveTab] = useState<"typography" | "colors" | "spacing" | "borders" | "css" | "image">("colors");
+  const [editorActiveTab, setEditorActiveTab] = useState<
+    "typography" | "colors" | "spacing" | "borders" | "css" | "image"
+  >("colors");
   const [saving, setSaving] = useState(false);
   const [shareId, setShareId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState<"code" | "preview" | "design">("preview");
+  const [activeTab, setActiveTab] = useState<"code" | "preview" | "design">(
+    "preview",
+  );
   const [selectedElement, setSelectedElement] = useState<any>(null);
-  
+
   // Ref to hold the silently updated HTML to avoid iframe flashing during editing
   const localHtmlRef = useRef(deepHtml);
-  useEffect(() => { localHtmlRef.current = deepHtml; }, [deepHtml]);
+  useEffect(() => {
+    localHtmlRef.current = deepHtml;
+  }, [deepHtml]);
   const codeEndRef = useRef<HTMLDivElement>(null);
   const [deploying, setDeploying] = useState(false);
   const [deployedUrl, setDeployedUrl] = useState<string | null>(null);
@@ -151,7 +161,8 @@ export default function PreviewPanel({
   // Auto-switch to Preview when generation finishes and content exists
   useEffect(() => {
     if (!isGenerating && (layout || deepHtml)) {
-      if (activeTab === "code" || activeTab === "preview") setActiveTab("preview");
+      if (activeTab === "code" || activeTab === "preview")
+        setActiveTab("preview");
     }
   }, [isGenerating, layout, deepHtml]);
 
@@ -168,101 +179,134 @@ export default function PreviewPanel({
 
   // Sync edits to parent on tab exit if changed
   useEffect(() => {
-    if (activeTab !== "design" && localHtmlRef.current !== deepHtml && onDeepHtmlChange) {
+    if (
+      activeTab !== "design" &&
+      localHtmlRef.current !== deepHtml &&
+      onDeepHtmlChange
+    ) {
       onDeepHtmlChange(localHtmlRef.current || "");
     }
   }, [activeTab, onDeepHtmlChange, deepHtml]);
 
   const getCleanHtmlSnapshot = (idoc: Document) => {
     const clone = idoc.documentElement.cloneNode(true) as HTMLElement;
-    
+
     // Modern targeted removal
-    clone.querySelector('#crawlcube-editor-script')?.remove();
-    clone.querySelector('#crawlcube-editor-style')?.remove();
-    clone.querySelectorAll('#cc-hover-badge').forEach(el => el.remove());
-    clone.querySelectorAll('#crawlcube-custom-scrollbar').forEach(el => el.remove());
-    
+    clone.querySelector("#crawlcube-editor-script")?.remove();
+    clone.querySelector("#crawlcube-editor-style")?.remove();
+    clone.querySelectorAll("#cc-hover-badge").forEach((el) => el.remove());
+    clone
+      .querySelectorAll("#crawlcube-custom-scrollbar")
+      .forEach((el) => el.remove());
+
     // Legacy targeted removal (for instances already contaminated before the fix)
-    const styles = clone.querySelectorAll('style');
+    const styles = clone.querySelectorAll("style");
     for (let i = 0; i < styles.length; i++) {
-        if (styles[i].textContent?.includes('.editor-hover-outline')) styles[i].remove();
+      if (styles[i].textContent?.includes(".editor-hover-outline"))
+        styles[i].remove();
     }
-    const scripts = clone.querySelectorAll('script');
+    const scripts = clone.querySelectorAll("script");
     for (let i = 0; i < scripts.length; i++) {
-        if (scripts[i].textContent?.includes('CrawlCube Editor Script Initializing')) scripts[i].remove();
+      if (
+        scripts[i].textContent?.includes("CrawlCube Editor Script Initializing")
+      )
+        scripts[i].remove();
     }
-    
-    clone.querySelectorAll('.editor-hover-outline').forEach(el => el.classList.remove('editor-hover-outline'));
+
+    clone
+      .querySelectorAll(".editor-hover-outline")
+      .forEach((el) => el.classList.remove("editor-hover-outline"));
 
     let finalHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
-    
+
     // Aggressively remove literal \n string artifacts caused by the old buggy string concatenation
-    finalHtml = finalHtml.replace(/\\n/g, ""); 
-    
+    finalHtml = finalHtml.replace(/\\n/g, "");
+
     return finalHtml;
   };
 
   const rebuildResponsiveStylesheet = (idoc: Document) => {
-    let styleTag = idoc.getElementById('cc-custom-edits');
+    let styleTag = idoc.getElementById("cc-custom-edits");
     if (!styleTag) {
-      styleTag = idoc.createElement('style');
-      styleTag.id = 'cc-custom-edits';
+      styleTag = idoc.createElement("style");
+      styleTag.id = "cc-custom-edits";
       if (idoc.head) idoc.head.appendChild(styleTag);
       else idoc.body.appendChild(styleTag);
     }
-    
+
     let newCss = "";
-    idoc.querySelectorAll('[data-cc-desktop], [data-cc-mobile]').forEach((el) => {
-      const elId = el.getAttribute('data-editor-id');
-      if (!elId) return;
-      
-      const dSafe = el.getAttribute('data-cc-desktop') || "{}";
-      const mSafe = el.getAttribute('data-cc-mobile') || "{}";
-      
-      let d = {}, m = {};
-      try { d = JSON.parse(dSafe); } catch (e) {}
-      try { m = JSON.parse(mSafe); } catch (e) {}
-      
-      if (Object.keys(d).length > 0) {
-        newCss += `[data-editor-id="${elId}"] { `;
-        for (const [k, v] of Object.entries(d)) {
-          let prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
-          newCss += `${prop}: ${v} !important; `;
+    idoc
+      .querySelectorAll("[data-cc-desktop], [data-cc-mobile]")
+      .forEach((el) => {
+        const elId = el.getAttribute("data-editor-id");
+        if (!elId) return;
+
+        const dSafe = el.getAttribute("data-cc-desktop") || "{}";
+        const mSafe = el.getAttribute("data-cc-mobile") || "{}";
+
+        let d = {},
+          m = {};
+        try {
+          d = JSON.parse(dSafe);
+        } catch (e) {}
+        try {
+          m = JSON.parse(mSafe);
+        } catch (e) {}
+
+        if (Object.keys(d).length > 0) {
+          newCss += `[data-editor-id="${elId}"] { `;
+          for (const [k, v] of Object.entries(d)) {
+            let prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
+            newCss += `${prop}: ${v} important!; `;
+          }
+          newCss += `}\n`;
         }
-        newCss += `}\n`;
-      }
-      
-      if (Object.keys(m).length > 0) {
-        newCss += `@media (max-width: 767px) {\n  [data-editor-id="${elId}"] { `;
-        for (const [k, v] of Object.entries(m)) {
-          let prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
-          newCss += `${prop}: ${v} !important; `;
+
+        if (Object.keys(m).length > 0) {
+          newCss += `@media (max-width: 767px) {\n [data-editor-id="${elId}"] { `;
+          for (const [k, v] of Object.entries(m)) {
+            let prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
+            newCss += `${prop}: ${v} important!; `;
+          }
+          newCss += `}\n}\n`;
         }
-        newCss += `}\n}\n`;
-      }
-    });
+      });
     styleTag.textContent = newCss;
   };
 
   const handleStyleUpdate = (id: string, styles: Record<string, string>) => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
         const idoc = iframe.contentDocument;
-        const target = idoc.querySelector(`[data-editor-id="${id}"]`) as HTMLElement;
+        const target = idoc.querySelector(
+          `[data-editor-id="${id}"]`,
+        ) as HTMLElement;
         if (target) {
           const isMobileViewport = viewport === "mobile";
-          
+
           if (isMobileViewport) {
-              const currentMobile = JSON.parse(target.getAttribute('data-cc-mobile') || "{}");
-              Object.assign(currentMobile, styles);
-              target.setAttribute('data-cc-mobile', JSON.stringify(currentMobile));
+            const currentMobile = JSON.parse(
+              target.getAttribute("data-cc-mobile") || "{}",
+            );
+            Object.assign(currentMobile, styles);
+            target.setAttribute(
+              "data-cc-mobile",
+              JSON.stringify(currentMobile),
+            );
           } else {
-              const currentDesktop = JSON.parse(target.getAttribute('data-cc-desktop') || "{}");
-              Object.assign(currentDesktop, styles);
-              target.setAttribute('data-cc-desktop', JSON.stringify(currentDesktop));
+            const currentDesktop = JSON.parse(
+              target.getAttribute("data-cc-desktop") || "{}",
+            );
+            Object.assign(currentDesktop, styles);
+            target.setAttribute(
+              "data-cc-desktop",
+              JSON.stringify(currentDesktop),
+            );
           }
-          
+
           rebuildResponsiveStylesheet(idoc);
           localHtmlRef.current = getCleanHtmlSnapshot(idoc);
           setPendingChanges(true);
@@ -275,9 +319,13 @@ export default function PreviewPanel({
 
   const handleContentUpdate = (id: string, content: string) => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
-        const target = iframe.contentDocument.querySelector(`[data-editor-id="${id}"]`) as HTMLElement;
+        const target = iframe.contentDocument.querySelector(
+          `[data-editor-id="${id}"]`,
+        ) as HTMLElement;
         if (target) {
           target.innerHTML = content;
           localHtmlRef.current = getCleanHtmlSnapshot(iframe.contentDocument);
@@ -290,11 +338,18 @@ export default function PreviewPanel({
     }
   };
 
-  const handleAttributeUpdate = (id: string, attributes: Record<string, string>) => {
+  const handleAttributeUpdate = (
+    id: string,
+    attributes: Record<string, string>,
+  ) => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
-        const target = iframe.contentDocument.querySelector(`[data-editor-id="${id}"]`) as HTMLElement;
+        const target = iframe.contentDocument.querySelector(
+          `[data-editor-id="${id}"]`,
+        ) as HTMLElement;
         if (target) {
           for (const [key, value] of Object.entries(attributes)) {
             target.setAttribute(key, value);
@@ -311,16 +366,20 @@ export default function PreviewPanel({
 
   const handleResetStyle = (id: string, initialStyle: string) => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
         const idoc = iframe.contentDocument;
-        const target = idoc.querySelector(`[data-editor-id="${id}"]`) as HTMLElement;
+        const target = idoc.querySelector(
+          `[data-editor-id="${id}"]`,
+        ) as HTMLElement;
         if (target) {
-          target.removeAttribute('data-cc-desktop');
-          target.removeAttribute('data-cc-mobile');
-          target.setAttribute('style', initialStyle || '');
+          target.removeAttribute("data-cc-desktop");
+          target.removeAttribute("data-cc-mobile");
+          target.setAttribute("style", initialStyle || "");
           rebuildResponsiveStylesheet(idoc);
-          
+
           localHtmlRef.current = getCleanHtmlSnapshot(idoc);
           setPendingChanges(true);
         }
@@ -332,24 +391,35 @@ export default function PreviewPanel({
 
   const handleSelectElement = (id: string) => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
-        const target = iframe.contentDocument.querySelector(`[data-editor-id="${id}"]`) as HTMLElement;
+        const target = iframe.contentDocument.querySelector(
+          `[data-editor-id="${id}"]`,
+        ) as HTMLElement;
         if (target) {
           // Emulate a perfect native click sequence directly
-          target.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-          target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+          target.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+          target.dispatchEvent(
+            new MouseEvent("click", { bubbles: true, cancelable: true }),
+          );
           return;
         }
       }
     } catch (e) {
       console.warn("Direct DOM select failed", e);
     }
-    
+
     // Fallback to postMessage
-    const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+    const iframe = document.querySelector(
+      'iframe[title="Deep Dive Preview"]',
+    ) as HTMLIFrameElement;
     if (iframe?.contentWindow) {
-      iframe.contentWindow.postMessage({ type: 'SELECT_ELEMENT', data: { id } }, '*');
+      iframe.contentWindow.postMessage(
+        { type: "SELECT_ELEMENT", data: { id } },
+        "*",
+      );
     }
   };
 
@@ -359,7 +429,7 @@ export default function PreviewPanel({
   }, [streamingCode]);
 
   // Determine active mode
-  const isDeepMode = !!deepHtml && !layout;
+  const isDeepMode = !!deepHtml && layout!;
 
   // Brand name for URL bar — works for both modes
   const brandName = isDeepMode
@@ -386,25 +456,31 @@ export default function PreviewPanel({
     }
   }, [savedId]);
 
-  // Expose handleSave to BuildPage for the "Stay and save" modal button
+  // Expose handleSave to BuildPage for the"Stay and save" modal button
   useEffect(() => {
     if (saveRef) saveRef.current = handleSave;
   });
   // ── Save ──
   const handleSave = async () => {
-    if ((!layout && !deepHtml) || saving) return;
-    if (saved && !pendingChanges) return;
+    if ((!layout && deepHtml!) || saving) return;
+    if (saved && pendingChanges!) return;
     setSaving(true);
 
     try {
       let thumbnailStr: string | null = null;
       // Make sure we use the locally edited string if saving while in Design tab
-      const htmlToSave = activeTab === "design" ? (localHtmlRef.current || deepHtml) : deepHtml;
-      
+      const htmlToSave =
+        activeTab === "design" ? localHtmlRef.current || deepHtml : deepHtml;
+
       try {
-        const sourceHtml = isDeepMode && htmlToSave 
-          ? getCleanHtmlSnapshot(new DOMParser().parseFromString(htmlToSave, 'text/html'))
-          : layout ? generateHtml(layout) : "";
+        const sourceHtml =
+          isDeepMode && htmlToSave
+            ? getCleanHtmlSnapshot(
+                new DOMParser().parseFromString(htmlToSave, "text/html"),
+              )
+            : layout
+              ? generateHtml(layout)
+              : "";
         if (sourceHtml) {
           thumbnailStr = await captureThumbnail(sourceHtml);
         }
@@ -425,7 +501,7 @@ export default function PreviewPanel({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             id: savedId,
-            ...payload
+            ...payload,
           }),
         });
         if (res.ok) {
@@ -537,8 +613,11 @@ export default function PreviewPanel({
     let filename = "website";
 
     if (isDeepMode && deepHtml) {
-      // Use DOMParser to safely execute our robust clean pipeline for downloads 
-      const parsed = new DOMParser().parseFromString(localHtmlRef.current || deepHtml, 'text/html');
+      // Use DOMParser to safely execute our robust clean pipeline for downloads
+      const parsed = new DOMParser().parseFromString(
+        localHtmlRef.current || deepHtml,
+        "text/html",
+      );
       html = getCleanHtmlSnapshot(parsed);
       filename = brandName.toLowerCase().replace(/\s+/g, "-");
     } else if (layout) {
@@ -601,7 +680,7 @@ export default function PreviewPanel({
         return;
       }
 
-      if (!res.ok || !data.url) throw new Error(data.error ?? "Deploy failed");
+      if (!res.ok || data!.url) throw new Error(data.error ?? "Deploy failed");
 
       setDeployedUrl(data.url);
     } catch (err: any) {
@@ -622,28 +701,28 @@ export default function PreviewPanel({
 
   const saveLabel = () => {
     if (saving) return "Saving…";
-    if (saved && !pendingChanges) return "Saved!";
+    if (saved && pendingChanges!) return "Saved!";
     if (saved && pendingChanges) return "Save changes";
     return "Save";
   };
 
-  const saveDisabled = saving || (saved && !pendingChanges);
+  const saveDisabled = saving || (saved && pendingChanges!);
   const hasContent = !!(layout || deepHtml);
 
   // ── Empty state — only show if not generating and no code streaming ──
-  if (!hasContent && !isGenerating && !streamingCode) {
+  if (!hasContent && isGenerating! && streamingCode!) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-neutral-50 dark:bg-neutral-950 gap-4 relative">
-        <div className="absolute inset-0 dark:opacity-100 opacity-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-        <div className="absolute inset-0 dark:opacity-0 opacity-100 bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="flex-1 flex flex-col items-center justify-center bg-background gap-4 relative">
+        <div className="absolute inset-0 dark:opacity-100 opacity-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none" />
+        <div className="absolute inset-0 dark:opacity-0 opacity-100 bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none" />
         <div className="relative text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center justify-center mx-auto">
-            <Monitor className="w-7 h-7 text-neutral-400 dark:text-neutral-600" />
+          <div className="w-16 h-16 rounded-2xl bg-background border border-border flex items-center justify-center mx-auto">
+            <Monitor className="w-7 h-7 text-muted-foreground" />
           </div>
-          <p className="text-neutral-500 text-sm font-medium">
+          <p className="text-muted-foreground text-sm font-medium">
             Your website preview will appear here
           </p>
-          <p className="text-neutral-700 text-xs max-w-60 mx-auto">
+          <p className="text-foreground text-xs max-w-60 mx-auto">
             Describe your website in the chat on the left and hit Enter to
             generate
           </p>
@@ -653,9 +732,9 @@ export default function PreviewPanel({
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#fcfcfc] dark:bg-[#111111]">
+    <div className="flex flex-col h-full bg-background">
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 border-b border-transparent dark:border-white/5 bg-[#fcfcfc] dark:bg-[#111111] gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 border-b border-border bg-background gap-3">
         {/* Left Controls & URL bar */}
         <div className="flex items-center gap-3 w-full md:w-auto">
           {/* Chat Toggle (Desktop only) */}
@@ -663,7 +742,7 @@ export default function PreviewPanel({
             <button
               onClick={onToggleChat}
               title={isChatPanelHidden ? "Show Sidebar" : "Hide Sidebar"}
-              className="hidden md:flex items-center justify-center p-2 rounded-xl bg-transparent dark:bg-white/5 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-white/10 hover:bg-neutral-100 dark:hover:bg-white/10 transition-all cursor-pointer"
+              className="hidden md:flex items-center justify-center p-2 rounded-xl bg-transparent /5 text-muted-foreground border border-border hover:bg-secondary /10 transition-all cursor-pointer"
             >
               {isChatPanelHidden ? (
                 <PanelLeftOpen className="w-5 h-5" />
@@ -673,8 +752,8 @@ export default function PreviewPanel({
             </button>
           )}
 
-          <div className="flex items-center gap-3 bg-transparent dark:bg-[#161616] border border-neutral-300 dark:border-white/10 rounded-xl px-4 py-2 flex-1 max-w-xs shadow-sm">
-            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate">
+          <div className="flex items-center gap-3 bg-transparent dark:bg-[#161616] border border-border rounded-xl px-4 py-2 flex-1 max-w-xs shadow-sm">
+            <span className="text-sm font-medium text-foreground truncate">
               {urlBarName}.crawlcube.app
             </span>
             {/* Deep Dive badge in toolbar */}
@@ -695,14 +774,18 @@ export default function PreviewPanel({
             disabled={saveDisabled}
             title="Save"
             className={`shrink-0 flex items-center justify-center w-11 h-11 rounded-xl transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-              saved && !pendingChanges
+              saved && pendingChanges!
                 ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-500/10"
                 : pendingChanges
-                  ? "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10"
-                  : "text-neutral-600 dark:text-neutral-300 bg-transparent hover:bg-neutral-100 dark:hover:bg-white/10"
+                  ? "text-primary dark:text-primary bg-primary/10 dark:bg-primary/10"
+                  : "text-muted-foreground bg-transparent hover:bg-secondary /10"
             }`}
           >
-            {saved && !pendingChanges ? <Check className="w-5 h-5" /> : <Save className="w-5 h-5" />}
+            {saved && pendingChanges! ? (
+              <Check className="w-5 h-5" />
+            ) : (
+              <Save className="w-5 h-5" />
+            )}
           </button>
 
           {/* Share */}
@@ -712,11 +795,15 @@ export default function PreviewPanel({
             title="Share"
             className={`shrink-0 flex items-center justify-center w-11 h-11 rounded-xl transition-all cursor-pointer disabled:opacity-50 ${
               copied
-                ? "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10"
-                : "text-neutral-600 dark:text-neutral-300 bg-transparent hover:bg-neutral-100 dark:hover:bg-white/10"
+                ? "text-primary dark:text-primary bg-primary/10 dark:bg-primary/10"
+                : "text-muted-foreground bg-transparent hover:bg-secondary /10"
             }`}
           >
-            {copied ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
+            {copied ? (
+              <Check className="w-5 h-5" />
+            ) : (
+              <Share2 className="w-5 h-5" />
+            )}
           </button>
 
           {/* Download */}
@@ -724,9 +811,13 @@ export default function PreviewPanel({
             onClick={handleDownload}
             disabled={isGenerating}
             title="Download"
-            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer disabled:opacity-50"
+            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-secondary /10 text-muted-foreground transition-all cursor-pointer disabled:opacity-50"
           >
-            {isGenerating ? <Loader2 className="w-5 h-5 animate-spin"/> : <Download className="w-5 h-5" />}
+            {isGenerating ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Download className="w-5 h-5" />
+            )}
           </button>
 
           {/* Open in new tab */}
@@ -734,7 +825,7 @@ export default function PreviewPanel({
             onClick={handleOpenInTab}
             disabled={isGenerating || (!layout && !deepHtml)}
             title="Open full preview"
-            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-secondary/10 text-muted-foreground transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ExternalLink className="w-5 h-5" />
           </button>
@@ -756,9 +847,13 @@ export default function PreviewPanel({
                 onClick={handleDeploy}
                 disabled={deploying || isGenerating || !deepHtml}
                 title="Publish"
-                className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-600 dark:text-neutral-300 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-transparent hover:bg-secondary/10 text-muted-foreground transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {deploying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
+                {deploying ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Globe className="w-5 h-5" />
+                )}
               </button>
             )
           ) : (
@@ -766,16 +861,16 @@ export default function PreviewPanel({
           )}
 
           {/* Viewport toggle */}
-          <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-[#1a1a1a] border border-neutral-200 dark:border-white/5 rounded-xl p-1 h-11 shrink-0">
+          <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-[#1a1a1a] border border-border rounded-xl p-1 h-11 shrink-0">
             <button
               onClick={() => setViewport("desktop")}
-              className={`flex items-center justify-center w-10 sm:w-11 h-full rounded-lg transition-all cursor-pointer ${viewport === "desktop" ? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}
+              className={`flex items-center justify-center w-10 sm:w-11 h-full rounded-lg transition-all cursor-pointer ${viewport === "desktop" ? "bg-background dark:bg-neutral-700 text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Monitor className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewport("mobile")}
-              className={`flex items-center justify-center w-10 sm:w-11 h-full rounded-lg transition-all cursor-pointer ${viewport === "mobile" ? "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}
+              className={`flex items-center justify-center w-10 sm:w-11 h-full rounded-lg transition-all cursor-pointer ${viewport === "mobile" ? "bg-background dark:bg-neutral-700 text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Smartphone className="w-4 h-4" />
             </button>
@@ -784,14 +879,14 @@ export default function PreviewPanel({
       </div>
 
       {/* Code / Preview tabs */}
-      <div className="flex justify-center px-4 pt-4 pb-3 bg-[#fcfcfc] dark:bg-[#111111]">
-        <div className="flex items-center p-1 bg-transparent border border-neutral-300 dark:border-white/10 rounded-full w-full max-w-sm">
+      <div className="flex justify-center px-4 pt-4 pb-3 bg-background">
+        <div className="flex items-center p-1 bg-transparent border border-border rounded-full w-full max-w-sm">
           <button
             onClick={() => setActiveTab("code")}
             className={`flex-1 py-2 text-sm font-medium rounded-full transition-all cursor-pointer ${
               activeTab === "code"
-                ? "bg-white dark:bg-[#201d36] text-purple-600 dark:text-[#c084fc] shadow-sm ring-1 ring-black/5 dark:ring-white/5"
-                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                ? "bg-background dark:bg-[#201d36] text-primary dark:text-primary shadow-sm ring-1 ring-black/5 dark:ring-white/5"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Code
@@ -802,12 +897,14 @@ export default function PreviewPanel({
             }}
             className={`flex items-center justify-center gap-1 flex-1 py-2 text-sm font-medium rounded-full transition-all ${
               isGenerating
-                ? "cursor-not-allowed text-neutral-400 dark:text-[#404040]"
+                ? "cursor-not-allowed text-muted-foreground dark:text-[#404040]"
                 : activeTab === "preview"
-                  ? "bg-white dark:bg-[#201d36] text-purple-600 dark:text-[#c084fc] shadow-sm ring-1 ring-black/5 dark:ring-white/5 cursor-pointer"
-                  : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 cursor-pointer"
+                  ? "bg-background dark:bg-[#201d36] text-primary dark:text-primary shadow-sm ring-1 ring-black/5 dark:ring-white/5 cursor-pointer"
+                  : "text-muted-foreground hover:text-foreground cursor-pointer"
             }`}
-            title={isGenerating ? "Preview unlocks when generation is complete" : ""}
+            title={
+              isGenerating ? "Preview unlocks when generation is complete" : ""
+            }
           >
             Preview {isGenerating && <span className="text-[10px]">🔒</span>}
           </button>
@@ -818,12 +915,16 @@ export default function PreviewPanel({
               }}
               className={`flex items-center justify-center gap-1 flex-1 py-2 text-sm font-medium rounded-full transition-all ${
                 isGenerating
-                  ? "cursor-not-allowed text-neutral-400 dark:text-[#404040]"
+                  ? "cursor-not-allowed text-muted-foreground dark:text-[#404040]"
                   : activeTab === "design"
                     ? "bg-[#fdf2f8] dark:bg-[#341e30] text-pink-600 dark:text-[#f472b6] shadow-sm ring-1 ring-pink-500/20 cursor-pointer"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 cursor-pointer"
+                    : "text-muted-foreground hover:text-foreground cursor-pointer"
               }`}
-              title={isGenerating ? "Editing unlocks when generation is complete" : ""}
+              title={
+                isGenerating
+                  ? "Editing unlocks when generation is complete"
+                  : ""
+              }
             >
               Design {isGenerating && <span className="text-[10px]">🔒</span>}
             </button>
@@ -840,7 +941,7 @@ export default function PreviewPanel({
           </span>
         </div>
       ) : (
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-purple-500/10 border-b border-purple-500/20 text-xs text-purple-400">
+        <div className="flex items-center gap-2 px-4 py-1.5 bg-primary/10 border-b border-primary/20 text-xs text-primary">
           <Pencil className="w-3 h-3 shrink-0" />
           <span>Click any text in the preview to edit it directly</span>
         </div>
@@ -850,7 +951,7 @@ export default function PreviewPanel({
       <div className="flex-1 overflow-hidden flex flex-col">
         {activeTab === "code" ? (
           <div
-            className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-[#404040] scrollbar-track-transparent hover:scrollbar-thumb-neutral-400 dark:hover:scrollbar-thumb-[#525252] [&>pre]:!scrollbar-thin [&>pre]:!scrollbar-thumb-neutral-300 dark:[&>pre]:!scrollbar-thumb-[#404040] [&>pre]:!scrollbar-track-transparent hover:[&>pre]:!scrollbar-thumb-neutral-400 dark:hover:[&>pre]:!scrollbar-thumb-[#525252] bg-neutral-50 dark:bg-[#141414]"
+            className="flex-1 overflow-auto p-4 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-[#404040] scrollbar-track-transparent hover:scrollbar-thumb-neutral-400 dark:hover:scrollbar-thumb-[#525252] [&>pre]:scrollbar-thin [&>pre]:scrollbar-thumb-neutral-300 dark:[&>pre]:scrollbar-thumb-[#404040] [&>pre]:scrollbar-track-transparent hover:[&>pre]:scrollbar-thumb-neutral-400 dark:hover:[&>pre]:scrollbar-thumb-[#525252] bg-background dark:bg-[#141414]"
             style={{
               fontFamily: "'Fira Code', 'Cascadia Code', 'Consolas', monospace",
               fontSize: "12px",
@@ -862,7 +963,11 @@ export default function PreviewPanel({
               // the panel never goes blank between generations.
               const displayCode =
                 streamingCode ||
-                (isDeepMode && deepHtml ? deepHtml : layout ? generateHtml(layout) : "");
+                (isDeepMode && deepHtml
+                  ? deepHtml
+                  : layout
+                    ? generateHtml(layout)
+                    : "");
 
               return displayCode ? (
                 <SyntaxHighlighter
@@ -873,7 +978,8 @@ export default function PreviewPanel({
                     background: "transparent",
                     padding: 0,
                     fontSize: "13px",
-                    fontFamily: "'Fira Code', 'Cascadia Code', 'Consolas', monospace",
+                    fontFamily:
+                      "'Fira Code', 'Cascadia Code', 'Consolas', monospace",
                   }}
                   wrapLines={true}
                   wrapLongLines={true}
@@ -892,7 +998,7 @@ export default function PreviewPanel({
                 <div className="flex flex-col items-center justify-center h-full">
                   <p
                     style={{ fontFamily: "system-ui" }}
-                    className="text-sm text-neutral-500"
+                    className="text-sm text-muted-foreground"
                   >
                     Code will appear here during generation...
                   </p>
@@ -906,7 +1012,11 @@ export default function PreviewPanel({
             {isDeepMode ? (
               // Deep Dive — raw HTML in iframe
               <>
-                <DeepPreview html={deepHtml!} viewport={viewport} editable={activeTab === "design"} />
+                <DeepPreview
+                  html={deepHtml!}
+                  viewport={viewport}
+                  editable={activeTab === "design"}
+                />
                 {activeTab === "design" && selectedElement && (
                   <ElementEditorPanel
                     key={selectedElement.id}
@@ -914,11 +1024,19 @@ export default function PreviewPanel({
                     activeTab={editorActiveTab}
                     onTabChange={setEditorActiveTab}
                     onClose={() => setSelectedElement(null)}
-                    onUpdateStyle={(styles) => handleStyleUpdate(selectedElement.id, styles)}
-                    onUpdateContent={(content) => handleContentUpdate(selectedElement.id, content)}
-                    onUpdateAttribute={(attributes) => handleAttributeUpdate(selectedElement.id, attributes)}
+                    onUpdateStyle={(styles) =>
+                      handleStyleUpdate(selectedElement.id, styles)
+                    }
+                    onUpdateContent={(content) =>
+                      handleContentUpdate(selectedElement.id, content)
+                    }
+                    onUpdateAttribute={(attributes) =>
+                      handleAttributeUpdate(selectedElement.id, attributes)
+                    }
                     onSelectElement={handleSelectElement}
-                    onResetStyle={(initial) => handleResetStyle(selectedElement.id, initial)}
+                    onResetStyle={(initial) =>
+                      handleResetStyle(selectedElement.id, initial)
+                    }
                   />
                 )}
               </>

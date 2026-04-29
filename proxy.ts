@@ -2,11 +2,14 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
+  "/",                // ← Landing page is public
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
-  "/api/preview(.*)", // ← NEW: share links are public
-  "/preview(.*)", // ← NEW: preview pages are public
+  "/api/preview(.*)", // ← share links are public
+  "/preview(.*)",     // ← preview pages are public
+  "/privacy",         // ← legal pages
+  "/terms",           // ← legal pages
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

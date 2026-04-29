@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
 import { CreditsProvider } from "@/context/CreditsContext";
-
-const openSans = Open_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-open-sans", // optional but recommended
-});
 
 export const metadata: Metadata = {
   title: "CrawlCube",
@@ -30,7 +23,18 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <body className={openSans.className}>
+        {/* ── 🔤 FONTSHARE — Change this URL to swap fonts app-wide ── */}
+        <head>
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,900&f[]=clash-display@400,500,600,700&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=boska@400,500,700,900&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"

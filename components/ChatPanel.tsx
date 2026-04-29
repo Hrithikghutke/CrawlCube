@@ -19,32 +19,36 @@ import { ThemeStyle } from "@/types/layout";
 import { useCredits } from "@/context/CreditsContext";
 import { useAuth } from "@clerk/nextjs";
 import Logo from "@/assets/logo.svg";
-import { DEEP_DIVE_MODELS, CLAUDE_LOGO_SVG, getModelConfig } from "@/lib/modelConfig";
+import {
+  DEEP_DIVE_MODELS,
+  CLAUDE_LOGO_SVG,
+  getModelConfig,
+} from "@/lib/modelConfig";
 
-// ── Shimmer "Thinking" animation — matches Claude UI ──
+// ── Shimmer"Thinking" animation — matches Claude UI ──
 const shimmerStyle = `
-  @keyframes cc-shimmer {
-    0%   { background-position: -400px center; }
-    100% { background-position: 400px center; }
-  }
-  .cc-thinking {
-    background: linear-gradient(
-      90deg,
-      #4b5563 0%,
-      #4b5563 30%,
-      #d1d5db 50%,
-      #4b5563 70%,
-      #4b5563 100%
-    );
-    background-size: 400px 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: cc-shimmer 2s ease-in-out infinite;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-  }
+ @keyframes cc-shimmer {
+ 0% { background-position: -400px center; }
+ 100% { background-position: 400px center; }
+ }
+ .cc-thinking {
+ background: linear-gradient(
+ 90deg,
+ #4b5563 0%,
+ #4b5563 30%,
+ #d1d5db 50%,
+ #4b5563 70%,
+ #4b5563 100%
+ );
+ background-size: 400px 100%;
+ background-clip: text;
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+ animation: cc-shimmer 2s ease-in-out infinite;
+ font-size: 13px;
+ font-weight: 500;
+ letter-spacing: 0.01em;
+ }
 `;
 
 // ── Derive current thinking label from live agent steps ──
@@ -72,11 +76,11 @@ function getThinkingLabel(agentSteps?: AgentStep[]): string {
     // Use the step label if it's a real page name, else format the id
     const label = running.label?.trim();
     if (label && label.length > 0) {
-      // label is like "Services" or "Home" — already clean
+      // label is like"Services" or"Home"— already clean
       return `Building ${label}`;
     }
     // Fallback: format the id
-    const name = raw.charAt(0).toUpperCase() + raw.slice(1).replace(/-/g, " ");
+    const name = raw.charAt(0).toUpperCase() + raw.slice(1).replace(/-/g, "");
     return `Building ${name}`;
   }
 
@@ -177,7 +181,7 @@ function StepIcon({ status }: { status: AgentStatus }) {
       <div className="w-3.5 h-3.5 shrink-0 rounded-full bg-red-500/20 border border-red-500/50" />
     );
   return (
-    <div className="w-3.5 h-3.5 shrink-0 rounded-full border border-neutral-700" />
+    <div className="w-3.5 h-3.5 shrink-0 rounded-full border border-border" />
   );
 }
 
@@ -212,42 +216,42 @@ function GenerationProgress({
     <div className="space-y-px text-[11px] font-mono">
       {/* ── Architect block ── */}
       {architectStep && (
-        <div className="rounded-lg overflow-hidden border border-neutral-800/60">
+        <div className="rounded-lg overflow-hidden border border-border/60">
           {/* Header row — always visible */}
           <button
             onClick={() => onToggleArchitect(message.id)}
-            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/2 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-background/2 transition-colors"
           >
             <StepIcon status={architectStep.status} />
             <span
               className={`font-semibold tracking-wide flex-1 ${
                 architectStep.status === "done"
-                  ? "text-neutral-300"
+                  ? "text-muted-foreground"
                   : architectStep.status === "running"
                     ? "text-blue-300"
                     : architectStep.status === "error"
                       ? "text-red-400"
-                      : "text-neutral-600"
+                      : "text-muted-foreground"
               }`}
             >
               ARCHITECT
             </span>
             {/* Summary when done */}
             {architectStep.status === "done" && ad && (
-              <span className="text-neutral-500 truncate max-w-40">
+              <span className="text-muted-foreground truncate max-w-40">
                 {ad.brandName} · {ad.fonts.display} · {ad.colors.primary}
               </span>
             )}
             {/* Running message */}
             {architectStep.status === "running" && (
-              <span className="text-neutral-600">
+              <span className="text-muted-foreground">
                 {architectStep.message ?? "Analyzing..."}
               </span>
             )}
             {/* Chevron */}
             {architectStep.status === "done" && (
               <svg
-                className={`w-3 h-3 text-neutral-600 shrink-0 transition-transform ${message.architectOpen ? "rotate-180" : ""}`}
+                className={`w-3 h-3 text-muted-foreground shrink-0 transition-transform ${message.architectOpen ? "rotate-180" : ""}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -264,47 +268,47 @@ function GenerationProgress({
 
           {/* Expanded architect details */}
           {message.architectOpen && ad && (
-            <div className="px-3 pb-3 pt-1 border-t border-neutral-800/60 space-y-1.5">
+            <div className="px-3 pb-3 pt-1 border-t border-border/60 space-y-1.5">
               <div className="grid grid-cols-[80px_1fr] gap-x-3 gap-y-1">
-                <span className="text-neutral-600 uppercase tracking-widest text-[10px]">
+                <span className="text-muted-foreground uppercase tracking-widest text-[10px]">
                   Brand
                 </span>
-                <span className="text-neutral-300">{ad.brandName}</span>
+                <span className="text-muted-foreground">{ad.brandName}</span>
 
-                <span className="text-neutral-600 uppercase tracking-widest text-[10px]">
+                <span className="text-muted-foreground uppercase tracking-widest text-[10px]">
                   Primary
                 </span>
-                <span className="text-neutral-300">
+                <span className="text-muted-foreground">
                   <ColorSwatch hex={ad.colors.primary} />
                   {ad.colors.primary}
-                  <span className="text-neutral-600 mx-2">·</span>
+                  <span className="text-muted-foreground mx-2">·</span>
                   <ColorSwatch hex={ad.colors.secondary} />
                   {ad.colors.secondary}
                 </span>
 
-                <span className="text-neutral-600 uppercase tracking-widest text-[10px]">
+                <span className="text-muted-foreground uppercase tracking-widest text-[10px]">
                   Background
                 </span>
-                <span className="text-neutral-300">
+                <span className="text-muted-foreground">
                   <ColorSwatch hex={ad.colors.background} />
                   {ad.colors.background}
-                  <span className="text-neutral-600 mx-2">·</span>
+                  <span className="text-muted-foreground mx-2">·</span>
                   <ColorSwatch hex={ad.colors.surface} />
                   {ad.colors.surface}
                 </span>
 
-                <span className="text-neutral-600 uppercase tracking-widest text-[10px]">
+                <span className="text-muted-foreground uppercase tracking-widest text-[10px]">
                   Fonts
                 </span>
-                <span className="text-neutral-300">
+                <span className="text-muted-foreground">
                   {ad.fonts.display} / {ad.fonts.body}
                 </span>
 
-                <span className="text-neutral-600 uppercase tracking-widest text-[10px]">
+                <span className="text-muted-foreground uppercase tracking-widest text-[10px]">
                   Pages
                 </span>
-                <span className="text-neutral-300">
-                  {ad.pageLabels.join(" · ")}
+                <span className="text-muted-foreground">
+                  {ad.pageLabels.join("·")}
                 </span>
               </div>
             </div>
@@ -315,33 +319,33 @@ function GenerationProgress({
       {/* ── Developer block ── */}
       {developerStep &&
         (developerStep.status !== "idle" || pageSteps.length > 0) && (
-          <div className="rounded-lg border border-neutral-800/60 overflow-hidden">
+          <div className="rounded-lg border border-border/60 overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2">
               <StepIcon status={developerStep.status} />
               <span
                 className={`font-semibold tracking-wide flex-1 ${
                   developerStep.status === "done"
-                    ? "text-neutral-300"
+                    ? "text-muted-foreground"
                     : developerStep.status === "running"
                       ? "text-blue-300"
-                      : "text-neutral-600"
+                      : "text-muted-foreground"
                 }`}
               >
                 DEVELOPER
               </span>
               {developerStep.status === "running" && developerStep.message && (
-                <span className="text-neutral-600 truncate max-w-45">
+                <span className="text-muted-foreground truncate max-w-45">
                   {developerStep.message}
                 </span>
               )}
               {developerStep.status === "done" && (
-                <span className="text-neutral-500">Complete</span>
+                <span className="text-muted-foreground">Complete</span>
               )}
             </div>
 
             {/* Page sub-items */}
             {pageSteps.length > 0 && (
-              <div className="px-3 pb-2 border-t border-neutral-800/40 space-y-0.5 pt-1.5">
+              <div className="px-3 pb-2 border-t border-border/40 space-y-0.5 pt-1.5">
                 {pageSteps.map((page) => (
                   <div
                     key={page.id}
@@ -351,10 +355,10 @@ function GenerationProgress({
                     <span
                       className={`${
                         page.status === "done"
-                          ? "text-neutral-400"
+                          ? "text-muted-foreground"
                           : page.status === "running"
                             ? "text-blue-300/80"
-                            : "text-neutral-700"
+                            : "text-foreground"
                       }`}
                     >
                       {page.label}
@@ -373,22 +377,22 @@ function GenerationProgress({
           step.status !== "idle" && (
             <div
               key={step.id}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-800/60"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/60"
             >
               <StepIcon status={step.status} />
               <span
                 className={`font-semibold tracking-wide ${
                   step.status === "done"
-                    ? "text-neutral-300"
+                    ? "text-muted-foreground"
                     : step.status === "running"
                       ? "text-blue-300"
-                      : "text-neutral-600"
+                      : "text-muted-foreground"
                 }`}
               >
                 {step.id === "qa" ? "QA" : "VISUAL QA"}
               </span>
               {step.message && (
-                <span className="text-neutral-600">{step.message}</span>
+                <span className="text-muted-foreground">{step.message}</span>
               )}
             </div>
           ),
@@ -435,7 +439,7 @@ function QuestionCards({
         const ans = answers[q.id] || customInputs[q.id] || "";
         return `${q.text} ${ans}`;
       })
-      .join(" ");
+      .join("");
     onSubmit(compiled);
   };
 
@@ -443,26 +447,26 @@ function QuestionCards({
     <div className="space-y-3">
       {/* Intro text */}
       {intro && (
-        <p className="text-[13px] text-neutral-300 px-1 leading-relaxed">
+        <p className="text-[13px] text-muted-foreground px-1 leading-relaxed">
           {intro}
         </p>
       )}
 
       {/* Question card */}
       <div
-        className="rounded-xl border border-neutral-800 overflow-hidden"
+        className="rounded-xl border border-border overflow-hidden"
         style={{ background: "rgba(255,255,255,0.02)" }}
       >
         {/* Card header */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-800/60">
-          <span className="text-[11px] font-mono text-neutral-600 tracking-widest uppercase">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-border/60">
+          <span className="text-[11px] font-mono text-muted-foreground tracking-widest uppercase">
             {page + 1} / {total}
           </span>
           <div className="flex gap-1">
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="w-6 h-6 flex items-center justify-center rounded-md text-neutral-600 hover:text-neutral-300 disabled:opacity-20 transition-colors cursor-pointer"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-muted-foreground hover:text-muted-foreground disabled:opacity-20 transition-colors cursor-pointer"
             >
               <svg
                 width="12"
@@ -479,7 +483,7 @@ function QuestionCards({
             <button
               onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
               disabled={page === total - 1}
-              className="w-6 h-6 flex items-center justify-center rounded-md text-neutral-600 hover:text-neutral-300 disabled:opacity-20 transition-colors cursor-pointer"
+              className="w-6 h-6 flex items-center justify-center rounded-md text-muted-foreground hover:text-muted-foreground disabled:opacity-20 transition-colors cursor-pointer"
             >
               <svg
                 width="12"
@@ -498,7 +502,7 @@ function QuestionCards({
 
         {/* Question + options */}
         <div className="px-3 py-3 space-y-2.5">
-          <p className="text-[13px] text-neutral-200 font-medium leading-snug">
+          <p className="text-[13px] text-foreground font-medium leading-snug">
             {current.text}
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -525,7 +529,7 @@ function QuestionCards({
             })}
           </div>
 
-          {/* Custom input for "Other" */}
+          {/* Custom input for"Other"*/}
           {showCustom[current.id] && (
             <input
               autoFocus
@@ -539,7 +543,7 @@ function QuestionCards({
                 }));
                 setAnswers((p) => ({ ...p, [current.id]: e.target.value }));
               }}
-              className="w-full bg-transparent border border-neutral-700 focus:border-purple-500/60 rounded-lg px-3 py-2 text-[12px] text-neutral-200 placeholder:text-neutral-600 outline-none transition-colors"
+              className="w-full bg-transparent border border-border focus:border-primary/60 rounded-lg px-3 py-2 text-[12px] text-foreground placeholder:text-muted-foreground outline-none transition-colors"
             />
           )}
         </div>
@@ -757,8 +761,7 @@ export default function ChatPanel({
     // Don't persist the synthetic welcome message — it would fill crawlcube_messages
     // before the auto-start useEffect runs, causing the auto-start guard to bail early
     // and the deep-dive pipeline never triggering for detailed landing-page prompts.
-    const isOnlyWelcome =
-      messages.length === 1 && messages[0].id === "welcome";
+    const isOnlyWelcome = messages.length === 1 && messages[0].id === "welcome";
     if (isOnlyWelcome) return;
     try {
       // Strip completedHtml from messages — it's saved separately as crawlcube_deep_html
@@ -788,7 +791,7 @@ export default function ChatPanel({
     if (
       seedRaw &&
       initialModeRef.current === "deep" &&
-      !hasAutoStarted.current
+      hasAutoStarted!.current
     ) {
       try {
         const seeded: { role: string; content: string }[] = JSON.parse(seedRaw);
@@ -812,7 +815,7 @@ export default function ChatPanel({
   useEffect(() => {
     // Restore brief from previous session
     const storedBrief = sessionStorage.getItem("crawlcube_brief");
-    if (storedBrief && !briefRef.current) {
+    if (storedBrief && briefRef!.current) {
       briefRef.current = storedBrief;
     }
 
@@ -822,9 +825,9 @@ export default function ChatPanel({
     if (
       initialModeRef.current === "deep" &&
       initialPromptRef.current &&
-      !initialLayout &&
-      !restoredDeepHtml &&
-      !hasAutoStarted.current
+      initialLayout! &&
+      restoredDeepHtml! &&
+      hasAutoStarted!.current
     ) {
       hasAutoStarted.current = true;
       handleDeepDive(initialPromptRef.current);
@@ -883,7 +886,7 @@ export default function ChatPanel({
         throw new Error(errData.message ?? "Not enough credits.");
       }
       const data = await res.json();
-      if (!res.ok || !data.layout) throw new Error("Generation failed");
+      if (!res.ok || data!.layout) throw new Error("Generation failed");
 
       const normalized = normalizeLayout(data.layout);
       normalized.themeStyle = selectedTheme;
@@ -999,7 +1002,7 @@ export default function ChatPanel({
       );
     };
 
-    // Dynamically insert page steps after "developer" step when PAGE_NAMES fires
+    // Dynamically insert page steps after"developer" step when PAGE_NAMES fires
     const addPageSteps = (pages: string[], labels: string[]) => {
       setMessages((prev) =>
         prev.map((m) => {
@@ -1074,7 +1077,7 @@ export default function ChatPanel({
           // Only show timeout message if:
           // 1. We never got COMPLETE, AND
           // 2. We never got an ERROR event (ERROR already showed its own message)
-          if (!receivedComplete && !receivedError) {
+          if (!receivedComplete && receivedError!) {
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMessage.id
@@ -1104,7 +1107,7 @@ export default function ChatPanel({
         buffer = lines.pop() ?? "";
 
         for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
+          if (!line.startsWith("data:")) continue;
           const jsonStr = line.slice(6).trim();
           if (!jsonStr) continue;
 
@@ -1135,8 +1138,16 @@ export default function ChatPanel({
             case "ARCHITECT_DONE":
               updateStep("architect", "done", event.message);
               // Trigger content strategist + ui designer as running simultaneously
-              updateStep("content-strategist", "running", "Writing copy & brand voice...");
-              updateStep("ui-designer", "running", "Designing layout & visual system...");
+              updateStep(
+                "content-strategist",
+                "running",
+                "Writing copy & brand voice...",
+              );
+              updateStep(
+                "ui-designer",
+                "running",
+                "Designing layout & visual system...",
+              );
               // Store architect data in message for the dropdown
               if (event.architectData) {
                 setMessages((prev) =>
@@ -1166,7 +1177,7 @@ export default function ChatPanel({
                 "ui-designer",
                 "done",
                 event.heroVariant && event.featuresVariant
-                  ? `${event.heroVariant.replace(/-/g, " ")} · ${event.featuresVariant.replace(/-/g, " ")}`
+                  ? `${event.heroVariant.replace(/-/g, "")} · ${event.featuresVariant.replace(/-/g, "")}`
                   : "Layout spec ready",
               );
               break;
@@ -1188,10 +1199,15 @@ export default function ChatPanel({
                     ...m,
                     agentSteps: m.agentSteps?.map((s) => {
                       if (
-                        (s.id === "content-strategist" || s.id === "ui-designer") &&
+                        (s.id === "content-strategist" ||
+                          s.id === "ui-designer") &&
                         (s.status === "idle" || s.status === "running")
                       ) {
-                        return { ...s, status: "done" as AgentStatus, message: "Ready" };
+                        return {
+                          ...s,
+                          status: "done" as AgentStatus,
+                          message: "Ready",
+                        };
                       }
                       return s;
                     }),
@@ -1382,7 +1398,7 @@ export default function ChatPanel({
         if (!results.find((r) => r.id === id)) {
           results.push({
             id,
-            label: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, " "),
+            label: id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ""),
           });
         }
       }
@@ -1392,12 +1408,18 @@ export default function ChatPanel({
 
   const getLatestHtml = () => {
     try {
-      const iframe = document.querySelector('iframe[title="Deep Dive Preview"]') as HTMLIFrameElement;
+      const iframe = document.querySelector(
+        'iframe[title="Deep Dive Preview"]',
+      ) as HTMLIFrameElement;
       if (iframe?.contentDocument) {
-        const clone = iframe.contentDocument.documentElement.cloneNode(true) as HTMLElement;
-        clone.querySelector('#crawlcube-editor-script')?.remove();
-        clone.querySelector('#crawlcube-editor-style')?.remove();
-        clone.querySelectorAll('.editor-hover-outline').forEach(el => el.classList.remove('editor-hover-outline'));
+        const clone = iframe.contentDocument.documentElement.cloneNode(
+          true,
+        ) as HTMLElement;
+        clone.querySelector("#crawlcube-editor-script")?.remove();
+        clone.querySelector("#crawlcube-editor-style")?.remove();
+        clone
+          .querySelectorAll(".editor-hover-outline")
+          .forEach((el) => el.classList.remove("editor-hover-outline"));
         let finalHtml = "<!DOCTYPE html>\n" + clone.outerHTML;
         finalHtml = finalHtml.replace(/\\n/g, "");
         return finalHtml;
@@ -1420,7 +1442,7 @@ export default function ChatPanel({
     // If section identified and exists on multiple pages, ask which page first
     if (
       editMeta?.section &&
-      !targetPageId &&
+      targetPageId! &&
       editMeta.scope !== "navbar" &&
       editMeta.scope !== "head"
     ) {
@@ -1684,7 +1706,7 @@ export default function ChatPanel({
     const isOptionChip =
       promptOverride === "Yes, start the build" ||
       promptOverride === "Not yet, I want to change something";
-    if (promptOverride && !isOptionChip && !fromQuestionChip) {
+    if (promptOverride && isOptionChip! && fromQuestionChip!) {
       if (mode === "deep") {
         handleDeepDive(promptOverride);
       } else {
@@ -1703,7 +1725,7 @@ export default function ChatPanel({
 
     // Last 6 non-generating messages for context
     const recentHistory = messages
-      .filter((m) => !m.isGenerating && m.content)
+      .filter((m) => m!.isGenerating && m.content)
       .slice(-6)
       .map((m) => ({ role: m.role, content: m.content }));
 
@@ -1769,7 +1791,7 @@ export default function ChatPanel({
           const looksLikeJson =
             message?.trim().startsWith("{") || message?.includes("```json");
 
-          // Safety net — if AI returned "chat" but user said yes + we have a pending prompt, force generate
+          // Safety net — if AI returned"chat" but user said yes + we have a pending prompt, force generate
           const isAffirmative =
             /^(yes|yep|sure|ok|okay|go|build|start|do it|let'?s go|proceed|generate|yeah|yup|absolutely|perfect|ready)[\s!.]*$/i.test(
               prompt.trim(),
@@ -1783,14 +1805,14 @@ export default function ChatPanel({
 
           console.log("[chat] questions from API:", questions);
 
-          // Safety net — if message sounds like a confirmation but action was "chat",
+          // Safety net — if message sounds like a confirmation but action was"chat",
           // treat it as confirm and show Yes/No chips
           const looksLikeConfirm =
             /make sure|got everything|ready to build|shall I|should I start|want me to|go ahead|ready\?|start building|begin/i.test(
               message ?? "",
             );
 
-          if (looksLikeConfirm && !questions?.length) {
+          if (looksLikeConfirm && questions!?.length) {
             setMessages((prev) =>
               prev.map((m) =>
                 m.isGenerating
@@ -1849,7 +1871,7 @@ export default function ChatPanel({
           break;
 
         case "build_now":
-          // Rich prompt — show a brief "building now" message then start
+          // Rich prompt — show a brief"building now" message then start
           resolveThinking(
             message ||
               "Great, I have everything I need — building your site now! 🚀",
@@ -1860,7 +1882,7 @@ export default function ChatPanel({
           break;
 
         case "generate":
-          // User confirmed after a "confirm" — use stored brief or AI prompt
+          // User confirmed after a"confirm"— use stored brief or AI prompt
           resolveThinking(message || "Starting now! 🚀");
           const buildPrompt =
             pendingPromptRef.current || aiPrompt || briefRef.current || prompt;
@@ -1905,7 +1927,7 @@ export default function ChatPanel({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && e!.shiftKey) {
       e.preventDefault();
       void handleGenerate();
     }
@@ -1994,9 +2016,9 @@ export default function ChatPanel({
         if (isResolved) return;
         isResolved = true;
         clearTimeout(timeout);
-        
+
         const doc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (!doc || !doc.body) {
+        if (!doc || doc!.body) {
           cleanup();
           resolve(null);
           return;
@@ -2121,7 +2143,7 @@ export default function ChatPanel({
 
       const qaReport = await qaRes.json();
 
-      if (qaReport.passed || !qaReport.issues?.length) {
+      if (qaReport.passed || qaReport!.issues?.length) {
         updateStep(
           "visual-qa",
           "done",
@@ -2144,7 +2166,7 @@ export default function ChatPanel({
         "visual-qa",
         "running",
         `Found ${qaReport.issues.length} layout issue(s). Fixing...`,
-        qaReport.issues.slice(0, 2).join(" · "),
+        qaReport.issues.slice(0, 2).join("·"),
       );
 
       const fixRes = await fetch("/api/fix-html", {
@@ -2219,10 +2241,10 @@ export default function ChatPanel({
   return (
     <div className="flex flex-col h-full">
       {/* Chat Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          <span className="text-sm font-medium text-foreground">
             crawlcube.ai
           </span>
         </div>
@@ -2230,14 +2252,14 @@ export default function ChatPanel({
           {hasLayout && onShowPreview && (
             <button
               onClick={onShowPreview}
-              className="flex md:hidden items-center gap-1.5 text-xs font-medium bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 transition-all px-3 py-1.5 rounded-lg cursor-pointer"
+              className="flex md:hidden items-center gap-1.5 text-xs font-medium bg-primary/20 border border-primary/30 text-purple-300 hover:bg-primary/30 transition-all px-3 py-1.5 rounded-lg cursor-pointer"
             >
               Preview
             </button>
           )}
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
             New chat
@@ -2247,7 +2269,7 @@ export default function ChatPanel({
 
       {/* Mode toggle */}
       {/* Mode toggle */}
-      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-border shrink-0">
         <button
           onClick={() => setMode("fast")}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
@@ -2296,8 +2318,8 @@ export default function ChatPanel({
             <div
               className={`max-w-[85%] text-sm leading-relaxed ${
                 message.role === "user"
-                  ? "bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700/60 text-neutral-900 dark:text-neutral-100 rounded-2xl rounded-tr-sm px-4 py-3"
-                  : "bg-transparent text-neutral-800 dark:text-neutral-300 rounded-2xl rounded-tl-sm px-0 py-0"
+                  ? "bg-neutral-100 dark:bg-neutral-800 border border-border /60 text-foreground dark:text-neutral-100 rounded-2xl rounded-tr-sm px-4 py-3"
+                  : "bg-transparent text-foreground rounded-2xl rounded-tl-sm px-0 py-0"
               }`}
             >
               {/* Generation progress — new accordion UI */}
@@ -2309,7 +2331,7 @@ export default function ChatPanel({
                       setMessages((prev) =>
                         prev.map((m) =>
                           m.id === msgId
-                            ? { ...m, architectOpen: !m.architectOpen }
+                            ? { ...m, architectOpen: m!.architectOpen }
                             : m,
                         ),
                       );
@@ -2321,7 +2343,7 @@ export default function ChatPanel({
               {/* Thumbnail — shown after Deep Dive completes */}
               {message.thumbnail && (
                 <div
-                  className="mb-3 rounded-lg overflow-hidden border border-neutral-700 cursor-pointer"
+                  className="mb-3 rounded-lg overflow-hidden border border-border cursor-pointer"
                   onClick={() => window.open(message.thumbnail!, "_blank")}
                   title="Click to view full screenshot"
                 >
@@ -2346,9 +2368,9 @@ export default function ChatPanel({
                       }}
                     />
                   </div>
-                  <div className="flex items-center gap-1.5 px-2 py-1 bg-neutral-800 border-t border-neutral-700">
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-neutral-800 border-t border-border">
                     <Eye className="w-3 h-3 text-pink-400" />
-                    <span className="text-[10px] text-neutral-400">
+                    <span className="text-[10px] text-muted-foreground">
                       Visual QA screenshot · Click to expand
                     </span>
                   </div>
@@ -2356,7 +2378,7 @@ export default function ChatPanel({
               )}
 
               {/* Quick-reply option chips — only rendered ONCE here, before the message text */}
-              {message.options && message.options.length > 0 && !loading && (
+              {message.options && message.options.length > 0 && loading! && (
                 <div className="flex flex-wrap gap-2 px-1 pt-2">
                   {message.options.map((opt) => (
                     <button
@@ -2508,7 +2530,7 @@ export default function ChatPanel({
                   };
 
                   return (
-                    <div className="mt-4 pt-3 border-t border-neutral-800/60 font-mono text-[11px]">
+                    <div className="mt-4 pt-3 border-t border-border/60 font-mono text-[11px]">
                       {/* ── Submitted positive ── */}
                       {ratingState.submitted &&
                         ratingState.rating === "positive" && (
@@ -2531,7 +2553,7 @@ export default function ChatPanel({
                             </span>
                             <button
                               onClick={handleRerate}
-                              className="text-neutral-700 hover:text-neutral-400 transition-colors cursor-pointer tracking-wide"
+                              className="text-foreground hover:text-muted-foreground transition-colors cursor-pointer tracking-wide"
                             >
                               CHANGE
                             </button>
@@ -2561,7 +2583,7 @@ export default function ChatPanel({
                               </span>
                               <button
                                 onClick={handleRerate}
-                                className="text-neutral-700 hover:text-neutral-400 transition-colors cursor-pointer tracking-wide"
+                                className="text-foreground hover:text-muted-foreground transition-colors cursor-pointer tracking-wide"
                               >
                                 CHANGE
                               </button>
@@ -2610,7 +2632,7 @@ export default function ChatPanel({
                                   }
                                 }}
                                 disabled={fixLoading}
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-neutral-200 transition-all cursor-pointer disabled:opacity-40 tracking-wide"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border hover:border-neutral-500 text-muted-foreground hover:text-foreground transition-all cursor-pointer disabled:opacity-40 tracking-wide"
                               >
                                 {fixLoading ? (
                                   <>
@@ -2641,9 +2663,9 @@ export default function ChatPanel({
                         )}
 
                       {/* ── Initial rating buttons ── */}
-                      {!ratingState.submitted && !ratingState.showFeedback && (
+                      {!ratingState.submitted && ratingState!.showFeedback && (
                         <div className="flex items-center gap-3 mb-3">
-                          <span className="text-neutral-600 tracking-widest uppercase">
+                          <span className="text-muted-foreground tracking-widest uppercase">
                             Rate
                           </span>
                           <div className="flex items-center gap-2 flex-1">
@@ -2682,7 +2704,7 @@ export default function ChatPanel({
                             </button>
                             <button
                               onClick={handleNegative}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-800 hover:border-neutral-600 text-neutral-600 hover:text-neutral-400 transition-all cursor-pointer tracking-wide"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:border-neutral-600 text-muted-foreground hover:text-muted-foreground transition-all cursor-pointer tracking-wide"
                             >
                               <svg
                                 className="w-3 h-3"
@@ -2706,7 +2728,7 @@ export default function ChatPanel({
                       {/* ── Negative feedback form ── */}
                       {!ratingState.submitted && ratingState.showFeedback && (
                         <div className="space-y-3 mb-3">
-                          <span className="text-neutral-600 tracking-widest uppercase">
+                          <span className="text-muted-foreground tracking-widest uppercase">
                             What went wrong?
                           </span>
                           <div className="grid grid-cols-2 gap-1 mt-2">
@@ -2753,12 +2775,12 @@ export default function ChatPanel({
                             }
                             placeholder="Additional notes (optional)"
                             rows={2}
-                            className="w-full bg-transparent border border-neutral-800 focus:border-neutral-600 rounded-lg px-3 py-2 text-neutral-400 placeholder:text-neutral-700 outline-none resize-none transition-colors"
+                            className="w-full bg-transparent border border-border focus:border-neutral-600 rounded-lg px-3 py-2 text-muted-foreground placeholder:text-foreground outline-none resize-none transition-colors"
                           />
                           <div className="flex items-center gap-3">
                             <button
                               onClick={handleFeedbackSubmit}
-                              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-neutral-200 transition-all cursor-pointer tracking-wide"
+                              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border hover:border-neutral-500 text-muted-foreground hover:text-foreground transition-all cursor-pointer tracking-wide"
                             >
                               <svg
                                 className="w-3 h-3"
@@ -2781,7 +2803,7 @@ export default function ChatPanel({
                                   r ? { ...r, showFeedback: false } : r,
                                 )
                               }
-                              className="text-neutral-700 hover:text-neutral-500 transition-colors cursor-pointer tracking-wide"
+                              className="text-foreground hover:text-muted-foreground transition-colors cursor-pointer tracking-wide"
                             >
                               CANCEL
                             </button>
@@ -2794,7 +2816,7 @@ export default function ChatPanel({
 
               {/* Message text */}
               {/* Message text */}
-              {message.isGenerating && !message.agentSteps ? (
+              {message.isGenerating && message!.agentSteps ? (
                 // Fast mode or chat API reply — static thinking
                 <div className="px-1 py-0.5">
                   <ThinkingText label="Thinking" />
@@ -2827,7 +2849,7 @@ export default function ChatPanel({
                         i % 2 === 1 ? (
                           <strong
                             key={i}
-                            className={`font-medium ${message.role === "user" ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-950 dark:text-neutral-100"}`}
+                            className={`font-medium ${message.role === "user" ? "text-foreground dark:text-neutral-100" : "text-neutral-950 dark:text-neutral-100"}`}
                           >
                             {part}
                           </strong>
@@ -2847,8 +2869,8 @@ export default function ChatPanel({
 
         {/* ── Page picker — shown when edit section is ambiguous ── */}
         {pagePicker && (
-          <div className="mx-1 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-900/60 space-y-2 font-mono text-[11px]">
-            <p className="text-neutral-500 tracking-widest uppercase">
+          <div className="mx-1 p-3 rounded-lg border border-border bg-background/60 space-y-2 font-mono text-[11px]">
+            <p className="text-muted-foreground tracking-widest uppercase">
               Which page should I fix?
             </p>
             <div className="flex flex-wrap gap-2">
@@ -2867,14 +2889,14 @@ export default function ChatPanel({
                     ]);
                     handleSurgicalEdit(instruction, editMeta, page.id);
                   }}
-                  className="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 text-neutral-700 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 transition-all cursor-pointer tracking-wide uppercase"
+                  className="px-3 py-1.5 rounded-lg border border-border hover:border-foreground/40 text-foreground hover:text-foreground transition-all cursor-pointer tracking-wide uppercase"
                 >
                   {page.label}
                 </button>
               ))}
               <button
                 onClick={() => setPagePicker(null)}
-                className="px-3 py-1.5 text-neutral-700 hover:text-neutral-500 transition-colors cursor-pointer tracking-wide"
+                className="px-3 py-1.5 text-foreground hover:text-muted-foreground transition-colors cursor-pointer tracking-wide"
               >
                 CANCEL
               </button>
@@ -2885,7 +2907,7 @@ export default function ChatPanel({
         {/* Suggestion chips */}
         {messages.length === 1 && (
           <div className="space-y-2 mt-4">
-            <p className="text-xs text-neutral-600 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Try one of these:
             </p>
             <div className="flex flex-col gap-2">
@@ -2893,7 +2915,7 @@ export default function ChatPanel({
                 <button
                   key={i}
                   onClick={() => handleGenerate(s)}
-                  className="text-left text-xs text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:text-neutral-900 dark:hover:text-neutral-200 rounded-xl px-3 py-2.5 transition-all duration-200 cursor-pointer"
+                  className="text-left text-xs text-muted-foreground bg-background border border-border hover:border-primary/50 dark:hover:border-primary/50 hover:text-foreground rounded-xl px-3 py-2.5 transition-all duration-200 cursor-pointer"
                 >
                   {s}
                 </button>
@@ -2909,7 +2931,7 @@ export default function ChatPanel({
         <div className="px-4 pb-2">
           <button
             onClick={() => setShowThemes(!showThemes)}
-            className="flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-muted-foreground transition-colors cursor-pointer"
           >
             <span
               className="w-2 h-2 rounded-full"
@@ -2927,8 +2949,8 @@ export default function ChatPanel({
               }}
             />
             <span>
-              Style:{" "}
-              <strong className="text-neutral-300">
+              Style:{""}
+              <strong className="text-muted-foreground">
                 {getThemeLabel(selectedTheme)}
               </strong>
             </span>
@@ -2968,7 +2990,7 @@ export default function ChatPanel({
       {/* Input area */}
       <div className="px-4 pb-4">
         <div
-          className="flex flex-col bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl transition-all duration-200 shadow-sm dark:shadow-none overflow-visible"
+          className="flex flex-col bg-background border border-border rounded-2xl transition-all duration-200 shadow-sm dark:shadow-none overflow-visible"
           style={{
             borderColor: loading
               ? mode === "deep"
@@ -2992,7 +3014,7 @@ export default function ChatPanel({
                     : "Describe your website..."
               }
               rows={1}
-              className="flex-1 bg-transparent text-sm text-neutral-900 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-600 outline-none resize-none max-h-30 scrollbar-none"
+              className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground outline-none resize-none max-h-30 scrollbar-none"
             />
           </div>
 
@@ -3001,7 +3023,7 @@ export default function ChatPanel({
             {/* Left: model selector (Deep Dive) or fast mode label */}
             {mode === "deep" ? (
               <div className="relative">
-                {selectedModel === "anthropic/claude-opus-4" && !loading && (
+                {selectedModel === "anthropic/claude-opus-4" && loading! && (
                   <div
                     className="mb-2 flex items-start gap-2 px-3 py-2 rounded-xl text-xs"
                     style={{
@@ -3012,9 +3034,9 @@ export default function ChatPanel({
                   >
                     <span className="shrink-0 mt-0.5">⏳</span>
                     <span>
-                      Opus takes <strong>3–5 minutes</strong> and uses{" "}
+                      Opus takes <strong>3–5 minutes</strong> and uses{""}
                       <strong>300–500 credits</strong> for a complete site. For
-                      faster results, try{" "}
+                      faster results, try{""}
                       <button
                         onClick={() =>
                           setSelectedModel("anthropic/claude-sonnet-4.6")
@@ -3048,88 +3070,109 @@ export default function ChatPanel({
 
                 {/* Dropdown — opens upward */}
                 {showModelPicker && (
-                  <div
-                    className="absolute bottom-full mb-2 left-0 rounded-xl overflow-hidden z-50 min-w-48 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 shadow-xl dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
-                  >
-                    {MODELS.map(({ model, label, sublabel, minCreditsToStart, credits: estimatedCredits, logo }) => {
-                      const currentCredits = credits ?? 0;
-                      const insufficientCredits = currentCredits < minCreditsToStart;
-                      return (
-                      <button
-                        key={model}
-                        onClick={() => {
-                          if (!insufficientCredits) {
-                            setSelectedModel(model);
-                            setShowModelPicker(false);
-                          }
-                        }}
-                        disabled={insufficientCredits}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
-                          insufficientCredits
-                            ? "opacity-50 cursor-not-allowed bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900/50"
-                            : "cursor-pointer hover:bg-neutral-100 dark:hover:bg-white/5"
-                        }`}
-                        style={{
-                          background:
-                            selectedModel === model && !insufficientCredits
-                              ? "rgba(236,72,153,0.08)"
-                              : undefined,
-                        }}
-                      >
-                        {/* Claude logo */}
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: logo ?? CLAUDE_LOGO_SVG,
-                          }}
-                          className={`shrink-0 self-start mt-0.5 ${
-                            insufficientCredits ? "text-neutral-400 dark:text-neutral-600" : ""
-                          }`}
-                        />
-
-                        {/* Label + sublabel */}
-                        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                          <span
-                            className={`text-xs font-semibold truncate ${
-                              selectedModel === model && !insufficientCredits
-                                ? "text-pink-400"
-                                : insufficientCredits
-                                ? "text-neutral-500"
-                                : "text-neutral-700 dark:text-neutral-200"
+                  <div className="absolute bottom-full mb-2 left-0 rounded-xl overflow-hidden z-50 min-w-48 bg-background dark:bg-[#141414] border border-border shadow-xl dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+                    {MODELS.map(
+                      ({
+                        model,
+                        label,
+                        sublabel,
+                        minCreditsToStart,
+                        credits: estimatedCredits,
+                        logo,
+                      }) => {
+                        const currentCredits = credits ?? 0;
+                        const insufficientCredits =
+                          currentCredits < minCreditsToStart;
+                        return (
+                          <button
+                            key={model}
+                            onClick={() => {
+                              if (!insufficientCredits) {
+                                setSelectedModel(model);
+                                setShowModelPicker(false);
+                              }
+                            }}
+                            disabled={insufficientCredits}
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
+                              insufficientCredits
+                                ? "opacity-50 cursor-not-allowed bg-background/50 hover:bg-background /50"
+                                : "cursor-pointer hover:bg-secondary /5"
                             }`}
-                          >
-                            {label}
-                          </span>
-                          <span className="text-[10px] text-neutral-500 text-wrap leading-snug">
-                            {sublabel}
-                            {insufficientCredits && (
-                              <div className="text-red-500 dark:text-red-400 font-semibold mt-1">
-                                Requires {minCreditsToStart} credits (You have {Math.floor(currentCredits)}) to avoid truncation.
-                              </div>
-                            )}
-                          </span>
-                        </div>
-
-                        {/* Credits + checkmark */}
-                        <div className="flex items-center gap-2 shrink-0 self-start mt-0.5">
-                          <span
-                            className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap"
                             style={{
                               background:
-                                selectedModel === model && !insufficientCredits
-                                  ? "rgba(236,72,153,0.2)"
-                                  : "rgba(255,255,255,0.06)",
-                              color:
-                                selectedModel === model && !insufficientCredits ? "#f9a8d4" : insufficientCredits ? "#3f3f46" : "#525252",
+                                selectedModel === model && insufficientCredits!
+                                  ? "rgba(236,72,153,0.08)"
+                                  : undefined,
                             }}
                           >
-                            {estimatedCredits}
-                          </span>
-                          {selectedModel === model && !insufficientCredits && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                          )}
-                        </div>
-                      </button>
-                    )})}
+                            {/* Claude logo */}
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: logo ?? CLAUDE_LOGO_SVG,
+                              }}
+                              className={`shrink-0 self-start mt-0.5 ${
+                                insufficientCredits
+                                  ? "text-muted-foreground"
+                                  : ""
+                              }`}
+                            />
+
+                            {/* Label + sublabel */}
+                            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                              <span
+                                className={`text-xs font-semibold truncate ${
+                                  selectedModel === model &&
+                                  insufficientCredits!
+                                    ? "text-pink-400"
+                                    : insufficientCredits
+                                      ? "text-muted-foreground"
+                                      : "text-foreground"
+                                }`}
+                              >
+                                {label}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground text-wrap leading-snug">
+                                {sublabel}
+                                {insufficientCredits && (
+                                  <div className="text-red-500 dark:text-red-400 font-semibold mt-1">
+                                    Requires {minCreditsToStart} credits (You
+                                    have {Math.floor(currentCredits)}) to avoid
+                                    truncation.
+                                  </div>
+                                )}
+                              </span>
+                            </div>
+
+                            {/* Credits + checkmark */}
+                            <div className="flex items-center gap-2 shrink-0 self-start mt-0.5">
+                              <span
+                                className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                                style={{
+                                  background:
+                                    selectedModel === model &&
+                                    insufficientCredits!
+                                      ? "rgba(236,72,153,0.2)"
+                                      : "rgba(255,255,255,0.06)",
+                                  color:
+                                    selectedModel === model &&
+                                    insufficientCredits!
+                                      ? "#f9a8d4"
+                                      : insufficientCredits
+                                        ? "#3f3f46"
+                                        : "#525252",
+                                }}
+                              >
+                                {estimatedCredits}
+                              </span>
+                              {selectedModel === model &&
+                                insufficientCredits! && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+                                )}
+                            </div>
+                          </button>
+                        );
+                      },
+                    )}
                   </div>
                 )}
               </div>
@@ -3164,21 +3207,21 @@ export default function ChatPanel({
             ) : (
               <button
                 onClick={() => void handleGenerate()}
-                disabled={loading || !input.trim()}
+                disabled={loading || !input?.trim()}
                 className="shrink-0 w-8 h-8 rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200 cursor-pointer"
                 style={{ background: mode === "deep" ? "#ec4899" : "#a855f7" }}
               >
                 {loading ? (
-                  <LoaderCircle className="w-4 h-4 animate-spin text-white" />
+                  <LoaderCircle className="w-4 h-4 animate-spin text-foreground" />
                 ) : (
-                  <Send className="w-3.5 h-3.5 text-white" />
+                  <Send className="w-3.5 h-3.5 text-foreground" />
                 )}
               </button>
             )}
           </div>
         </div>
 
-        <p className="text-[10px] text-neutral-500 dark:text-neutral-700 mt-1.5 text-center">
+        <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
           Press Enter to send · Shift+Enter for new line
         </p>
       </div>

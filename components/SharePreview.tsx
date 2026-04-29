@@ -49,27 +49,27 @@ export default function SharePreview({ shareId }: { shareId: string }) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-neutral-950 flex items-center justify-center">
+      <div className="h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-neutral-500 text-sm">Loading preview...</p>
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground text-sm">Loading preview...</p>
         </div>
       </div>
     );
   }
 
-  if (notFound || (!layout && !deepHtml)) {
+  if (notFound || (!layout && deepHtml!)) {
     return (
-      <div className="h-screen bg-neutral-950 flex flex-col items-center justify-center gap-4">
-        <p className="text-neutral-300 text-lg font-semibold">
+      <div className="h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground text-lg font-semibold">
           Preview not found
         </p>
-        <p className="text-neutral-600 text-sm">
+        <p className="text-muted-foreground text-sm">
           This link may have expired or doesn't exist.
         </p>
         <Link
           href="/"
-          className="mt-2 px-5 py-2.5 bg-purple-500 hover:bg-purple-400 text-white text-sm font-semibold rounded-xl transition-all"
+          className="mt-2 px-5 py-2.5 bg-primary hover:bg-primary/90 text-foreground text-sm font-semibold rounded-xl transition-all"
         >
           Build your own →
         </Link>
@@ -78,9 +78,9 @@ export default function SharePreview({ shareId }: { shareId: string }) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-neutral-950">
+    <div className="h-screen flex flex-col bg-background">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 bg-neutral-950 border-b border-neutral-800">
+      <div className="flex items-center justify-between px-5 py-3 bg-background border-b border-border">
         {/* Left — CrawlCube branding */}
         <Link href="/" className="flex items-center gap-2">
           <img src={Logo.src} className="w-7 h-7" alt="logo" />
@@ -88,29 +88,29 @@ export default function SharePreview({ shareId }: { shareId: string }) {
         </Link>
 
         {/* Center — site name */}
-        <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-1.5">
+        <div className="flex items-center gap-2 bg-secondary border border-border rounded-lg px-3 py-1.5">
           <div className="flex gap-1">
             <div className="w-2 h-2 rounded-full bg-red-500/60" />
             <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
             <div className="w-2 h-2 rounded-full bg-green-500/60" />
           </div>
-          <span className="text-xs text-neutral-500 truncate max-w-40">
+          <span className="text-xs text-muted-foreground truncate max-w-40">
             {siteName.toLowerCase().replace(/\s+/g, "")}.crawlcube.app
           </span>
         </div>
 
         {/* Right — viewport + CTA */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+          <div className="flex items-center bg-secondary border border-border rounded-lg p-1">
             <button
               onClick={() => setViewport("desktop")}
-              className={`p-1.5 rounded-md transition-all cursor-pointer ${viewport === "desktop" ? "bg-neutral-700 text-white" : "text-neutral-500"}`}
+              className={`p-1.5 rounded-md transition-all cursor-pointer ${viewport === "desktop" ? "bg-neutral-700 text-foreground" : "text-muted-foreground"}`}
             >
               <Monitor className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewport("mobile")}
-              className={`p-1.5 rounded-md transition-all cursor-pointer ${viewport === "mobile" ? "bg-neutral-700 text-white" : "text-neutral-500"}`}
+              className={`p-1.5 rounded-md transition-all cursor-pointer ${viewport === "mobile" ? "bg-neutral-700 text-foreground" : "text-muted-foreground"}`}
             >
               <Smartphone className="w-3.5 h-3.5" />
             </button>
@@ -118,7 +118,7 @@ export default function SharePreview({ shareId }: { shareId: string }) {
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 bg-purple-500 hover:bg-purple-400 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
+            className="flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-foreground text-xs font-semibold px-3 py-2 rounded-lg transition-all"
           >
             <ExternalLink className="w-3 h-3" />
             Build yours
@@ -133,7 +133,7 @@ export default function SharePreview({ shareId }: { shareId: string }) {
           <DeepPreview html={deepHtml} viewport={viewport} />
         ) : (
           <div
-            className="bg-white rounded-lg overflow-auto shadow-2xl transition-all duration-300"
+            className="bg-background rounded-lg overflow-auto shadow-2xl transition-all duration-300"
             style={{
               width: viewport === "mobile" ? "390px" : "100%",
               minHeight: "100%",

@@ -250,7 +250,7 @@ export default function PricingPage({
   const upgradePlans = SUBSCRIPTION_PLANS.filter((p) => p.id !== currentPlan);
 
   return (
-    <div className=" min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white">
+    <div className=" min-h-screen bg-background text-foreground">
       {toast && (
         <Toast
           message={toast.message}
@@ -260,17 +260,17 @@ export default function PricingPage({
         />
       )}
       {/* ── Top bar with back button ── */}
-      <div className="border-b border-neutral-200 dark:border-neutral-800 px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-border px-6 py-4 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
         <button
           onClick={() => router.back()}
-          className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -282,7 +282,7 @@ export default function PricingPage({
           <h1 className="text-4xl font-bold mb-2">
             {isSubscribed ? "Manage Your Plan" : "Choose Your Plan"}
           </h1>
-          <p className="text-neutral-500 dark:text-neutral-400">
+          <p className="text-muted-foreground">
             {isSubscribed
               ? "Top up credits, upgrade, or manage your subscription."
               : "Start building stunning websites with AI. Cancel anytime."}
@@ -292,13 +292,13 @@ export default function PricingPage({
         {/* ── Billing toggle (unsubscribed or upgrade view) ── */}
         {(!isSubscribed || showUpgrade) && (
           <div className="flex justify-center mb-8">
-            <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm dark:shadow-none rounded-full p-1">
+            <div className="flex items-center gap-1 bg-background border border-border shadow-sm dark:shadow-none rounded-full p-1">
               <button
                 onClick={() => setPeriod("monthly")}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
                   period === "monthly"
-                    ? "bg-neutral-100 dark:bg-white text-neutral-900 dark:text-black"
-                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "bg-neutral-100 text-foreground dark:text-black"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Monthly
@@ -307,12 +307,12 @@ export default function PricingPage({
                 onClick={() => setPeriod("annual")}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                   period === "annual"
-                    ? "bg-neutral-100 dark:bg-white text-neutral-900 dark:text-black"
-                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "bg-neutral-100 text-foreground dark:text-black"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Annually
-                <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">
+                <span className="text-xs bg-green-500 text-foreground px-2 py-0.5 rounded-full font-bold">
                   Save 17%
                 </span>
               </button>
@@ -328,13 +328,13 @@ export default function PricingPage({
                 key={plan.id}
                 className={`relative rounded-2xl border p-6 flex flex-col gap-5 transition-shadow ${
                   plan.popular
-                    ? "border-purple-500 bg-white dark:bg-neutral-900 shadow-xl shadow-purple-500/10"
-                    : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 shadow-sm dark:shadow-none"
+                    ? "border-primary bg-background shadow-xl shadow-purple-500/10"
+                    : "border-border bg-background/40 shadow-sm dark:shadow-none"
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                    <span className="bg-primary text-foreground text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                       <Crown className="w-3 h-3" /> Most Popular
                     </span>
                   </div>
@@ -342,7 +342,9 @@ export default function PricingPage({
 
                 <div>
                   <h3 className="text-xl font-bold mb-1">{plan.label}</h3>
-                  <p className="text-neutral-500 dark:text-neutral-400 text-sm">{plan.sublabel}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {plan.sublabel}
+                  </p>
                 </div>
 
                 <div>
@@ -350,7 +352,7 @@ export default function PricingPage({
                     <span className="text-4xl font-black">
                       {getMonthlyEquivalent(plan, period, currency)}
                     </span>
-                    <span className="text-neutral-500 dark:text-neutral-400 text-sm">/mo</span>
+                    <span className="text-muted-foreground text-sm">/mo</span>
                   </div>
                   {period === "annual" && (
                     <p className="text-emerald-600 dark:text-green-400 text-xs mt-1">
@@ -359,8 +361,8 @@ export default function PricingPage({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-transparent rounded-xl px-4 py-3">
-                  <Zap className="w-4 h-4 text-purple-400" />
+                <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 border border-border dark:border-transparent rounded-xl px-4 py-3">
+                  <Zap className="w-4 h-4 text-primary" />
                   <span className="font-semibold text-sm">
                     {plan.creditsPerMonth.toLocaleString()} credits / month
                   </span>
@@ -371,13 +373,14 @@ export default function PricingPage({
                   disabled={loadingId === plan.id}
                   className={`w-full py-3 rounded-xl font-semibold text-sm transition-all ${
                     plan.popular
-                      ? "bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-400 text-white"
-                      : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white"
+                      ? "bg-purple-600 hover:bg-purple-700 dark:bg-primary dark:hover:bg-primary/90 text-foreground"
+                      : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-foreground"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {loadingId === plan.id ? (
                     <span className="flex items-center justify-center gap-2">
-                      <RefreshCw className="w-4 h-4 animate-spin" />{" "}
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      {""}
                       Processing...
                     </span>
                   ) : (
@@ -385,7 +388,7 @@ export default function PricingPage({
                   )}
                 </button>
 
-                <ul className="space-y-2 text-sm text-neutral-600 dark:text-neutral-300">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500 dark:text-green-400 shrink-0" />
                     All AI models (DeepSeek, Gemini, Sonnet)
@@ -424,11 +427,11 @@ export default function PricingPage({
         {isSubscribed && (
           <div className="space-y-8">
             {/* Current plan card */}
-            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm dark:shadow-none">
+            <div className="bg-background border border-border rounded-2xl p-6 shadow-sm dark:shadow-none">
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center">
-                    <Crown className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                    <Crown className="w-6 h-6 text-primary dark:text-primary" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -437,7 +440,7 @@ export default function PricingPage({
                       </p>
                       {isCancelled ? (
                         <span className="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-medium">
-                          Cancels{" "}
+                          Cancels{""}
                           {subscriptionEndDate
                             ? subscriptionEndDate.toLocaleDateString("en-IN", {
                                 day: "numeric",
@@ -452,9 +455,10 @@ export default function PricingPage({
                         </span>
                       )}
                     </div>
-                    <p className="text-neutral-500 dark:text-neutral-400 text-sm capitalize">
-                      {currentPeriod} billing ·{" "}
-                      {currentPlanData?.creditsPerMonth.toLocaleString()}{" "}
+                    <p className="text-muted-foreground text-sm capitalize">
+                      {currentPeriod} billing ·{""}
+                      {currentPlanData?.creditsPerMonth.toLocaleString()}
+                      {""}
                       credits/month
                     </p>
                   </div>
@@ -469,7 +473,7 @@ export default function PricingPage({
                         )
                       : ""}
                   </p>
-                  <p className="text-neutral-500 dark:text-neutral-400 text-xs">/month</p>
+                  <p className="text-muted-foreground text-xs">/month</p>
                 </div>
               </div>
 
@@ -477,7 +481,7 @@ export default function PricingPage({
               <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setShowUpgrade(!showUpgrade)}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-400 rounded-xl text-sm font-medium transition-all"
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary rounded-xl text-sm font-medium transition-all"
                 >
                   <TrendingUp className="w-4 h-4" />
                   {showUpgrade ? "Hide Plans" : "Upgrade / Change Plan"}
@@ -485,7 +489,7 @@ export default function PricingPage({
                 {!isCancelled && (
                   <button
                     onClick={() => setShowCancelConfirm(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-600 dark:hover:text-red-400 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 rounded-xl text-sm font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-600 dark:hover:text-red-400 border border-border text-muted-foreground rounded-xl text-sm font-medium transition-all"
                   >
                     <X className="w-4 h-4" />
                     Cancel Subscription
@@ -506,14 +510,14 @@ export default function PricingPage({
                       key={plan.id}
                       className={`relative rounded-2xl border p-5 flex flex-col gap-4 transition-shadow ${
                         plan.popular
-                          ? "border-purple-500 bg-white dark:bg-neutral-900 shadow-lg dark:shadow-none"
-                          : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 shadow-sm dark:shadow-none"
+                          ? "border-primary bg-background shadow-lg dark:shadow-none"
+                          : "border-border bg-background/40 shadow-sm dark:shadow-none"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="font-bold text-lg">{plan.label}</h3>
-                          <p className="text-neutral-500 dark:text-neutral-400 text-xs">
+                          <p className="text-muted-foreground text-xs">
                             {plan.sublabel}
                           </p>
                         </div>
@@ -521,12 +525,12 @@ export default function PricingPage({
                           <p className="text-2xl font-black">
                             {getMonthlyEquivalent(plan, period, currency)}
                           </p>
-                          <p className="text-neutral-500 dark:text-neutral-400 text-xs">/mo</p>
+                          <p className="text-muted-foreground text-xs">/mo</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-xl px-3 py-2 border border-neutral-200 dark:border-transparent">
-                        <Zap className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
+                      <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-xl px-3 py-2 border border-border dark:border-transparent">
+                        <Zap className="w-3.5 h-3.5 text-primary dark:text-primary" />
                         <span className="text-sm font-semibold">
                           {plan.creditsPerMonth.toLocaleString()} credits /
                           month
@@ -538,13 +542,14 @@ export default function PricingPage({
                         disabled={loadingId === plan.id}
                         className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all ${
                           plan.popular
-                            ? "bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-400 text-white"
-                            : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white"
+                            ? "bg-purple-600 hover:bg-purple-700 dark:bg-primary dark:hover:bg-primary/90 text-foreground"
+                            : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-foreground"
                         } disabled:opacity-50`}
                       >
                         {loadingId === plan.id ? (
                           <span className="flex items-center justify-center gap-2">
-                            <RefreshCw className="w-4 h-4 animate-spin" />{" "}
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            {""}
                             Processing...
                           </span>
                         ) : (
@@ -561,7 +566,7 @@ export default function PricingPage({
             <div>
               <div className="mb-5">
                 <h2 className="text-xl font-bold mb-1">Top Up Credits</h2>
-                <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Need more credits this month? Top up instantly.
                 </p>
               </div>
@@ -572,13 +577,13 @@ export default function PricingPage({
                     key={pack.id}
                     className={`relative rounded-2xl border p-5 flex flex-col gap-4 transition-all hover:scale-[1.02] ${
                       pack.popular
-                        ? "border-purple-500 bg-white dark:bg-neutral-900 shadow-xl dark:shadow-lg dark:shadow-purple-500/10"
-                        : "border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 shadow-sm dark:shadow-none"
+                        ? "border-primary bg-background shadow-xl dark:shadow-lg dark:shadow-purple-500/10"
+                        : "border-border bg-background/40 shadow-sm dark:shadow-none"
                     }`}
                   >
                     {pack.popular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        <span className="bg-primary text-foreground text-xs font-bold px-3 py-1 rounded-full">
                           Best Value
                         </span>
                       </div>
@@ -588,8 +593,8 @@ export default function PricingPage({
                       <div>
                         <h3 className="font-bold mb-1">{pack.label}</h3>
                         <div className="flex items-center gap-1.5">
-                          <Zap className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
-                          <span className="text-sm text-neutral-600 dark:text-neutral-300">
+                          <Zap className="w-3.5 h-3.5 text-primary dark:text-primary" />
+                          <span className="text-sm text-muted-foreground">
                             {pack.credits.toLocaleString()} credits
                           </span>
                         </div>
@@ -604,13 +609,14 @@ export default function PricingPage({
                       disabled={loadingId === pack.id}
                       className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all ${
                         pack.popular
-                          ? "bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-400 text-white"
-                          : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white"
+                          ? "bg-purple-600 hover:bg-purple-700 dark:bg-primary dark:hover:bg-primary/90 text-foreground"
+                          : "bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-foreground"
                       } disabled:opacity-50`}
                     >
                       {loadingId === pack.id ? (
                         <span className="flex items-center justify-center gap-2">
-                          <RefreshCw className="w-4 h-4 animate-spin" />{" "}
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          {""}
                           Processing...
                         </span>
                       ) : (
@@ -624,22 +630,22 @@ export default function PricingPage({
           </div>
         )}
 
-        <p className="text-center text-neutral-600 text-xs mt-12">
+        <p className="text-center text-muted-foreground text-xs mt-12">
           Payments secured by Razorpay · Credits never expire · Cancel anytime
         </p>
       </div>
 
       {/* ── Cancel confirmation modal ── */}
       {showCancelConfirm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-background border border-border rounded-2xl p-8 max-w-md w-full shadow-2xl">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-500/10 dark:bg-red-500/20 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-xl font-bold">Cancel Subscription?</h3>
             </div>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-6">
+            <p className="text-muted-foreground text-sm mb-6">
               Your subscription will remain active until the end of the current
               billing period. After that, you will lose access to your monthly
               credits. Your existing credits will not be affected.
@@ -647,14 +653,14 @@ export default function PricingPage({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="flex-1 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-sm font-medium transition-all"
+                className="flex-1 py-2.5 rounded-xl border border-border text-foreground hover:bg-secondary text-sm font-medium transition-all"
               >
                 Keep Subscription
               </button>
               <button
                 onClick={handleCancel}
                 disabled={cancelLoading}
-                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-all disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-foreground text-sm font-semibold transition-all disabled:opacity-50"
               >
                 {cancelLoading ? (
                   <span className="flex items-center justify-center gap-2">

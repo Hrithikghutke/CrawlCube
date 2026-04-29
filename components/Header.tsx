@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { Zap, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { useCredits } from "@/context/CreditsContext";
@@ -20,28 +21,36 @@ export default function Header({
   const { isSignedIn, user } = useUser();
   const { credits } = useCredits();
   const router = useRouter();
-  const isAdmin = user?.primaryEmailAddress?.emailAddress === "hrithikghutke01@gmail.com";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isAdmin =
+    user?.primaryEmailAddress?.emailAddress === "hrithikghutke01@gmail.com";
   const nav = (href: string) =>
     onNavigate ? onNavigate(href) : router.push(href);
 
   return (
-    <header 
-      className={`flex items-center justify-between px-4 sm:px-6 lg:px-10 transition-colors ${
-        transparent 
-          ? "bg-transparent py-6 border-b border-transparent " 
-          : "bg-white dark:bg-neutral-950 py-3 sm:py-4 border-b border-neutral-200 dark:border-neutral-900"
+    <header
+      className={`sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 lg:px-10 transition-all duration-300 ${
+        scrolled || !transparent
+          ? "bg-background/95 backdrop-blur-md py-4 shadow-sm border-b border-border/40"
+          : "bg-transparent py-4 border-b border-transparent"
       }`}
     >
       {/* Logo */}
       <button
-        onClick={() => nav("/")}
+        onClick={() => nav("/home")}
         className="flex items-center gap-2 cursor-pointer"
       >
-        <img src={Logo.src} className="w-8 sm:w-10 opacity-100 dark:opacity-90 transition-opacity" alt="CrawlCube logo" />
         <img
-          src={cname.src}
-          className="w-22 sm:w-30 hidden sm:block dark:invert-0 invert opacity-90 transition-all"
-          alt="CrawlCube"
+          src={Logo.src}
+          className="w-6 sm:w-6 lg:w-7 opacity-100 transition-opacity"
+          alt="CrawlCube logo"
         />
       </button>
 
@@ -50,10 +59,10 @@ export default function Header({
         {isSignedIn && credits !== null && (
           <Link
             href="/pricing"
-            className="flex items-center gap-1.5 bg-neutral-100/80 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-full px-2.5 sm:px-3 py-1.5 transition-colors"
+            className="flex items-center gap-1.5 bg-secondary/50 hover:bg-secondary border border-border rounded-full px-2.5 sm:px-3 py-1.5 transition-colors"
           >
-            <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-500 dark:text-yellow-400 fill-yellow-500 dark:fill-yellow-400" />
-            <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+            <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-500 fill-yellow-500" />
+            <span className="text-[12px] font-normal  text-foreground">
               {credits}
               <span className="hidden sm:inline">
                 {" "}
@@ -66,7 +75,7 @@ export default function Header({
         {isSignedIn && (
           <button
             onClick={() => nav("/dashboard")}
-            className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <LayoutDashboard className="w-4 h-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -76,7 +85,7 @@ export default function Header({
         {isAdmin && (
           <button
             onClick={() => nav("/admin")}
-            className="flex items-center gap-1.5 text-xs text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-primary dark:text-primary transition-colors cursor-pointer"
             title="Admin Dashboard"
           >
             <ShieldCheck className="w-4 h-4" />

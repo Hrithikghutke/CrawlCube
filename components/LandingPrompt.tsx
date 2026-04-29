@@ -17,6 +17,8 @@ import { ThemeStyle } from "@/types/layout";
 import { useCredits } from "@/context/CreditsContext";
 import Logo from "@/assets/logo.svg";
 import { DEEP_DIVE_MODELS, CLAUDE_LOGO_SVG } from "@/lib/modelConfig";
+import Image from "next/image";
+import bgLogo from "@/assets/login-assets/bg-logo-login.svg";
 
 type GenerationMode = "fast" | "deep";
 
@@ -32,7 +34,7 @@ const useTypewriter = (
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (subIndex === words[index].length + 1 && !isDeleting) {
+    if (subIndex === words[index].length + 1 && isDeleting!) {
       setTimeout(() => setIsDeleting(true), pause);
       return;
     }
@@ -185,7 +187,7 @@ export default function LandingPrompt() {
       const data = await res.json();
 
       if (res.status === 402) throw new Error("NO_CREDITS");
-      if (!res.ok || !data.layout) throw new Error("Generation failed");
+      if (!res.ok || data!.layout) throw new Error("Generation failed");
 
       const normalized = normalizeLayout(data.layout);
       normalized.themeStyle = selectedTheme;
@@ -222,89 +224,50 @@ export default function LandingPrompt() {
 
   return (
     <div className="relative flex flex-col items-center w-full min-h-[70vh] justify-center pb-12 pt-8 sm:pt-20 px-4 md:px-0 scroll-hidden">
-      {/* Deep Purple Aura / Glows */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{ zIndex: 0 }}
-      >
-        {/* Top left geometric blocks pattern */}
-        {/* <div 
-          className="absolute -top-[10%] -left-[10%] w-[50%] h-[70%] opacity-20 dark:opacity-[0.15] hidden sm:block"
-          style={{
-            backgroundImage: `linear-gradient(30deg, #6b21a8 12%, transparent 12.5%, transparent 87%, #6b21a8 87.5%, #6b21a8), linear-gradient(150deg, #6b21a8 12%, transparent 12.5%, transparent 87%, #6b21a8 87.5%, #6b21a8), linear-gradient(30deg, #6b21a8 12%, transparent 12.5%, transparent 87%, #6b21a8 87.5%, #6b21a8), linear-gradient(150deg, #6b21a8 12%, transparent 12.5%, transparent 87%, #6b21a8 87.5%, #6b21a8), linear-gradient(60deg, #86198f 25%, transparent 25.5%, transparent 75%, #86198f 75%, #86198f), linear-gradient(60deg, #86198f 25%, transparent 25.5%, transparent 75%, #86198f 75%, #86198f)`,
-            backgroundSize: `80px 140px`,
-            backgroundPosition: `0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px`,
-            maskImage: "radial-gradient(ellipse at center, black 10%, transparent 60%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 10%, transparent 60%)"
-          }}
-        /> */}
-
-        {/* Center Top Purple Glow */}
-
-        {/* Floating Matrix Squares (Right side) */}
-        <div
-          className="absolute top-[30%] right-[5%] w-[300px] h-[400px] opacity-60 hidden md:block"
-          style={{
-            backgroundImage: `radial-gradient(rgba(168, 85, 247, 0.4) 2px, transparent 2px)`,
-            backgroundSize: "32px 32px",
-            maskImage:
-              "radial-gradient(ellipse at center, black 20%, transparent 70%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 20%, transparent 70%)",
-          }}
-        />
-
-        {/* Decorative Floating Soft Squares */}
-        <div className="absolute top-[35%] right-[12%] w-4 h-4 rounded-sm bg-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.6)] rotate-12 hidden lg:block" />
-        <div className="absolute top-[25%] right-[8%] w-8 h-8 rounded-md border border-purple-400/20 bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.2)] -rotate-6 hidden lg:block" />
-        <div className="absolute bottom-[20%] left-[10%] w-6 h-6 rounded-md bg-purple-600/30 shadow-[0_0_20px_rgba(147,51,234,0.5)] rotate-45 hidden lg:block" />
-      </div>
-
-      {/* Floating Badge */}
-      <div className="relative z-10 flex items-center justify-center mb-8">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 backdrop-blur-md text-[11px] font-semibold tracking-wide text-neutral-600 dark:text-neutral-300 shadow-sm">
-          <svg
-            className="w-3 h-3 text-neutral-500"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-            />
-          </svg>
-          Website Generation Cannot Get Cheaper Than This.
-        </div>
+      <div className="absolute top-0 left-0  -z-10">
+        <Image src={bgLogo} alt="Robot" width={850} />
       </div>
 
       {/* Hero Headings */}
-      <div className="relative z-10 text-center space-y-4 mb-10 w-full max-w-3xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-neutral-900 dark:text-white">
-          Create beautiful designs
+      {/* ── Content ── */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6  pb-10 text-center">
+        {/* Badge pill */}
+        <div className="inline-block mb-6 bg-background border border-border rounded-full px-4 py-1.5 text-[13px] tracking-wide text-foreground/80">
+          ✦ AI Website Builder — Free to Start
+        </div>
+
+        {/* H1 Headline */}
+        <h1
+          className="font-bold text-foreground leading-[1.1] mb-6"
+          style={{ fontSize: "clamp(32px, 5vw, 68px)" }}
+        >
+          What Do You Want To Build Today?
         </h1>
-        <p className="text-base sm:text-lg text-neutral-500 dark:text-neutral-400 max-w-xl mx-auto font-medium">
-          Generate top-tier landing pages in seconds.{" "}
-          <a
-            href="#"
-            className="underline decoration-neutral-300 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
-          >
-            Watch video.
-          </a>
+
+        {/* Subheadline */}
+        <p
+          className="mx-auto  text-muted-foreground"
+          style={{
+            fontSize: "clamp(16px, 2vw, 18px)",
+            maxWidth: 600,
+            lineHeight: 1.7,
+          }}
+        >
+          Describe your business in plain English. CrawlCube generates a
+          complete, multi-page website with custom branding, real content, and
+          animations — ready to download or deploy instantly.
         </p>
       </div>
 
       {/* Input Shell */}
-      <div className="relative z-20 w-full max-w-3xl mx-auto rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] shadow-2xl transition-colors">
+      <div className="relative z-20 w-full max-w-3xl mx-auto rounded-3xl  bg-background shadow-2xl transition-colors">
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={animatedPlaceholder}
           rows={3}
-          className="w-full resize-none bg-transparent px-5 pt-5 pb-16 text-base text-neutral-800 dark:text-neutral-200 outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-600 scrollbar-none"
+          className="w-full resize-none bg-transparent px-5 pt-5 pb-16 text-base text-foreground outline-none placeholder:text-muted-foreground dark:placeholder:text-muted-foreground scrollbar-none"
         />
 
         {/* Bottom Toolbar inside textarea */}
@@ -315,16 +278,16 @@ export default function LandingPrompt() {
             <div className="relative">
               <button
                 onClick={() => setShowStackPicker(!showStackPicker)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background/50 hover:bg-secondary text-[11px] font-semibold text-muted-foreground transition-colors cursor-pointer"
               >
                 {selectedStack === "react" ? (
-                  <Atom className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  <Atom className="w-3 h-3 text-muted-foreground" />
                 ) : (
-                  <FileCode2 className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  <FileCode2 className="w-3 h-3 text-muted-foreground" />
                 )}
                 {selectedStack === "react" ? (
                   <span>
-                    React{" "}
+                    React{""}
                     <span className="text-[9px] text-[#C9A84C] ml-0.5">
                       BETA
                     </span>
@@ -336,20 +299,20 @@ export default function LandingPrompt() {
               </button>
 
               {showStackPicker && (
-                <div className="absolute top-full mb-2 sm:mb-0 sm:mt-2 left-0 sm:bottom-auto bottom-full w-48 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden z-30">
+                <div className="absolute top-full mb-2 sm:mb-0 sm:mt-2 left-0 sm:bottom-auto bottom-full w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
                   <button
                     onClick={() => {
                       setSelectedStack("html");
                       setShowStackPicker(false);
                     }}
-                    className="w-full flex items-center gap-2 p-3 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2 p-3 text-left hover:bg-background /5 transition-colors cursor-pointer"
                   >
-                    <FileCode2 className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                    <FileCode2 className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div>
-                      <span className="block text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      <span className="block text-xs font-semibold text-foreground">
                         HTML + JS
                       </span>
-                      <span className="block text-[10px] text-neutral-500">
+                      <span className="block text-[10px] text-muted-foreground">
                         Vanilla framework-less
                       </span>
                     </div>
@@ -359,17 +322,17 @@ export default function LandingPrompt() {
                       setSelectedStack("react");
                       setShowStackPicker(false);
                     }}
-                    className="w-full flex items-center gap-2 p-3 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2 p-3 text-left hover:bg-background /5 transition-colors cursor-pointer"
                   >
-                    <Atom className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                    <Atom className="w-4 h-4 text-muted-foreground shrink-0" />
                     <div>
-                      <span className="block text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5">
-                        React{" "}
+                      <span className=" text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        React{""}
                         <span className="text-[9px] py-0.5 px-1 rounded border border-[#C9A84C]/30 text-[#C9A84C]">
                           BETA
                         </span>
                       </span>
-                      <span className="block text-[10px] text-neutral-500">
+                      <span className="block text-[10px] text-muted-foreground">
                         Full frontend stack
                       </span>
                     </div>
@@ -383,32 +346,32 @@ export default function LandingPrompt() {
               <div className="relative">
                 <button
                   onClick={() => setShowModePicker(!showModePicker)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background/50 hover:bg-secondary text-[11px] font-semibold text-muted-foreground transition-colors cursor-pointer"
                 >
                   {selectedMode === "fast" ? (
-                    <Zap className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                    <Zap className="w-3 h-3 text-muted-foreground" />
                   ) : (
-                    <Telescope className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                    <Telescope className="w-3 h-3 text-muted-foreground" />
                   )}
                   {selectedMode === "fast" ? "Fast Mode" : "Deep Dive"}
                   <ChevronDown className="w-3 h-3 opacity-40" />
                 </button>
 
                 {showModePicker && (
-                  <div className="absolute top-full mt-2 left-0 w-48 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl overflow-hidden z-30">
+                  <div className="absolute top-full mt-2 left-0 w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
                     <button
                       onClick={() => {
                         setSelectedMode("fast");
                         setShowModePicker(false);
                       }}
-                      className="w-full flex items-center gap-2 p-3 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-2 p-3 text-left hover:bg-background /5 transition-colors cursor-pointer"
                     >
-                      <Zap className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                      <Zap className="w-4 h-4 text-muted-foreground shrink-0" />
                       <div>
-                        <span className="block text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                        <span className="block text-xs font-semibold text-foreground">
                           Fast Mode
                         </span>
-                        <span className="block text-[10px] text-neutral-500">
+                        <span className="block text-[10px] text-muted-foreground">
                           Structured layout (1 credit)
                         </span>
                       </div>
@@ -418,14 +381,14 @@ export default function LandingPrompt() {
                         setSelectedMode("deep");
                         setShowModePicker(false);
                       }}
-                      className="w-full flex items-center gap-2 p-3 text-left hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-2 p-3 text-left hover:bg-background /5 transition-colors cursor-pointer"
                     >
-                      <Telescope className="w-4 h-4 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                      <Telescope className="w-4 h-4 text-muted-foreground shrink-0" />
                       <div>
-                        <span className="block text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                        <span className="block text-xs font-semibold text-foreground">
                           Deep Dive
                         </span>
-                        <span className="block text-[10px] text-neutral-500">
+                        <span className="block text-[10px] text-muted-foreground">
                           Agent pipeline (3 credits)
                         </span>
                       </div>
@@ -440,7 +403,7 @@ export default function LandingPrompt() {
               <div className="relative">
                 <button
                   onClick={() => setShowModelPicker(!showModelPicker)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background/50 hover:bg-secondary text-[11px] font-semibold text-muted-foreground transition-colors cursor-pointer"
                 >
                   {/* Colored brand logo */}
                   <span
@@ -453,8 +416,8 @@ export default function LandingPrompt() {
                   <ChevronDown className="w-3 h-3 opacity-40" />
                 </button>
                 {showModelPicker && (
-                  <div className="absolute top-full mt-2 left-0 w-[300px] bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
-                    <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-neutral-400 tracking-wider">
+                  <div className="absolute top-full mt-2 left-0 w-[300px] bg-background dark:bg-[#1a1a1a] border border-border rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
+                    <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground tracking-wider">
                       {selectedStack === "react"
                         ? "REACT GENERATION"
                         : "HTML GENERATION"}
@@ -484,8 +447,8 @@ export default function LandingPrompt() {
                               disabled={insufficientCredits}
                               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors group ${
                                 insufficientCredits
-                                  ? "opacity-50 cursor-not-allowed bg-neutral-50 dark:bg-neutral-900"
-                                  : "hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
+                                  ? "opacity-50 cursor-not-allowed bg-background"
+                                  : "hover:bg-secondary cursor-pointer"
                               }`}
                             >
                               <div className="flex flex-col items-start gap-1">
@@ -493,8 +456,8 @@ export default function LandingPrompt() {
                                   <span
                                     className={`w-5 flex items-center justify-center shrink-0 transition-colors ${
                                       insufficientCredits
-                                        ? "text-neutral-400 dark:text-neutral-600"
-                                        : "text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-200"
+                                        ? "text-muted-foreground"
+                                        : "text-muted-foreground group-hover:text-foreground dark:group-hover:text-foreground"
                                     }`}
                                     dangerouslySetInnerHTML={{
                                       __html: logo ?? CLAUDE_LOGO_SVG,
@@ -503,15 +466,15 @@ export default function LandingPrompt() {
                                   <span
                                     className={`text-sm font-semibold ${
                                       insufficientCredits
-                                        ? "text-neutral-500 dark:text-neutral-500"
-                                        : "text-neutral-800 dark:text-neutral-200"
+                                        ? "text-muted-foreground"
+                                        : "text-foreground"
                                     }`}
                                   >
                                     {label}
                                   </span>
                                 </div>
 
-                                <div className="pl-8 text-[10px] text-neutral-400 text-left leading-snug">
+                                <div className="pl-8 text-[10px] text-muted-foreground text-left leading-snug">
                                   {sublabel && <span>{sublabel} • </span>}
                                   <span
                                     className={
@@ -547,15 +510,15 @@ export default function LandingPrompt() {
               <div className="relative">
                 <button
                   onClick={() => setShowThemePicker(!showThemePicker)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-[11px] font-semibold text-neutral-600 dark:text-neutral-300 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background/50 hover:bg-secondary text-[11px] font-semibold text-muted-foreground transition-colors cursor-pointer"
                 >
-                  <Settings2 className="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                  <Settings2 className="w-3 h-3 text-muted-foreground" />
                   {getThemeLabel(selectedTheme)}
                   <ChevronDown className="w-3 h-3 opacity-40" />
                 </button>
                 {showThemePicker && (
-                  <div className="absolute top-full mt-2 left-0 w-[240px] bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
-                    <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-neutral-400 tracking-wider">
+                  <div className="absolute top-full mt-2 left-0 w-[240px] bg-background dark:bg-[#1a1a1a] border border-border rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
+                    <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground tracking-wider">
                       STYLE OPTIONS
                     </div>
                     <div className="flex flex-col gap-1 mt-1">
@@ -566,12 +529,12 @@ export default function LandingPrompt() {
                             setSelectedTheme(style);
                             setShowThemePicker(false);
                           }}
-                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer group"
+                          className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors cursor-pointer group"
                         >
-                          <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+                          <span className="text-sm font-semibold text-foreground">
                             {getThemeLabel(style)}
                           </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-200/50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-200/50 dark:bg-neutral-800 text-muted-foreground group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
                             {style}
                           </span>
                         </button>
@@ -586,8 +549,8 @@ export default function LandingPrompt() {
           {/* Submit Button */}
           <button
             onClick={handleGenerate}
-            disabled={loading || !prompt.trim()}
-            className="pointer-events-auto flex items-center justify-center p-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            disabled={loading || !prompt?.trim()}
+            className="pointer-events-auto flex items-center justify-center p-2 rounded-xl bg-secondary hover:bg-secondary dark:hover:bg-neutral-200 text-foreground dark:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? (
               <img
