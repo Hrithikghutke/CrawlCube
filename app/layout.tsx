@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Generate professional websites in seconds with AI",
 };
 
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export default function RootLayout({
   children,

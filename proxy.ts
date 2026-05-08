@@ -10,6 +10,8 @@ const isPublicRoute = createRouteMatcher([
   "/preview(.*)",     // ← preview pages are public
   "/privacy",         // ← legal pages
   "/terms",           // ← legal pages
+  "/pricing(.*)",     // ← pricing page is public
+  "/plans(.*)",       // ← plans page is public
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

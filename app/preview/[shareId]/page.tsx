@@ -1,4 +1,4 @@
-import SharePreview from "@/components/SharePreview";
+import SharePreview from "@/components/share/SharePreview";
 
 export default async function PreviewPage({
   params,

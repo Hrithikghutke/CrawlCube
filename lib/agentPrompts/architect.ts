@@ -2,10 +2,10 @@ export interface ArchitectOutput {
   brandName: string;
   theme: "dark" | "light";
   visualMood:
-    | "cinematic-dark"       // dramatic, high-contrast, heavy shadows
-    | "editorial-clean"      // editorial whitespace, typography-driven
-    | "bold-energy"          // high-impact, vibrant, athletic
-    | "luxury-minimal"       // restrained palette, generous whitespace
+    | "cinematic-dark" // dramatic, high-contrast, heavy shadows
+    | "editorial-clean" // editorial whitespace, typography-driven
+    | "bold-energy" // high-impact, vibrant, athletic
+    | "luxury-minimal" // restrained palette, generous whitespace
     | "corporate-precision"; // structured, trustworthy, data-dense
   colors: {
     primary: string;
@@ -16,10 +16,10 @@ export interface ArchitectOutput {
   fonts: {
     display: string;
     body: string;
-    mono: string;            // ← ADD THIS
-    displayUrl: string;      // ← CHANGED: was single "url"
-    bodyUrl: string;         // ← CHANGED
-    monoUrl: string;         // ← ADD THIS
+    mono: string; // ← ADD THIS
+    displayUrl: string; // ← CHANGED: was single "url"
+    bodyUrl: string; // ← CHANGED
+    monoUrl: string; // ← ADD THIS
   };
   pages: string[];
   pageLabels: string[];
@@ -126,9 +126,9 @@ CURATED FONT PAIRINGS (grouped by mood):
   3. display="Sentient"         body="Supreme"          → <link href="https://api.fontshare.com/v2/css?f[]=sentient@400,500,700&f[]=supreme@400,500&display=swap" rel="stylesheet">
 
 ▸ Modern & Tech — SaaS, Startup, Fintech, EdTech, AI, Agency:
-  1. display="Clash Display"    body="Archivo"          → Display: <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">  Body: <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
-  2. display="Outfit"           body="Switzer"          → Display: <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">  Body: <link href="https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap" rel="stylesheet">
-  3. display="Archivo"          body="Satoshi"          → Display: <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">  Body: <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500&display=swap" rel="stylesheet">
+  
+  1. display="Outfit"           body="Switzer"          → Display: <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">  Body: <link href="https://api.fontshare.com/v2/css?f[]=switzer@300,400,500&display=swap" rel="stylesheet">
+  2. display="Archivo"          body="Satoshi"          → Display: <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">  Body: <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500&display=swap" rel="stylesheet">
 
 ▸ Creative & Informal — Cafe, Kids, Wellness, Coworking, Pet, Food Truck:
   1. display="Pally"            body="Neco"             → <link href="https://api.fontshare.com/v2/css?f[]=pally@400,500,700&f[]=neco@400&display=swap" rel="stylesheet">
@@ -151,7 +151,7 @@ Mono font (ALWAYS include — used for UI labels, overlines, metadata):
 FONT PAIRING BY BUSINESS TYPE (quick reference):
   Construction/engineering:   display="Khand"             body="Hind"            mono="Geist Mono"
   Gym/fitness/sports:         display="Khand"             body="Hind"            mono="Geist Mono"
-  SaaS/tech/startup:          display="Clash Display"     body="Archivo"         mono="Geist Mono"
+  SaaS/tech/startup:          display="Outfit"            body="Satoshi"         mono="Geist Mono"
   Agency/creative:            display="Outfit"            body="Switzer"         mono="Geist Mono"
   Restaurant high-end:        display="Zodiak"            body="Switzer"         mono="Geist Mono"
   Restaurant casual:          display="Pally"             body="Neco"            mono="Geist Mono"

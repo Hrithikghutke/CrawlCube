@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import BuildPage from "@/components/BuildPage";
+import BuildPage from "@/components/builder/html/BuildPage";
 
 export default function Build() {
   return (

@@ -13,14 +13,14 @@ import {
   Globe,
 } from "lucide-react";
 import { exportAsReact, exportAsNextjs } from "@/utils/exportProject";
-import MainGenerationProgress from "@/components/MainGenerationProgress";
+import MainGenerationProgress from "@/components/builder/html/MainGenerationProgress";
 import type { GeneratedReactFiles } from "@/types/react-generation";
-import ReactChatPanel from "@/components/ReactChatPanel";
+import ReactChatPanel from "@/components/builder/react/ReactChatPanel";
 import Logo from "@/assets/logo.svg";
 
 // IMPORTANT: Sandpack must be dynamically imported with ssr: false
 const ReactSandpack = dynamic(
-  () => import("@/components/ReactPreview/ReactSandpack"),
+  () => import("@/components/builder/react/ReactSandpack"),
   {
     ssr: false,
     loading: () => (
@@ -326,7 +326,7 @@ function ReactBuilderContent() {
                       Export
                     </button>
                     {showExport && (
-                      <div className="absolute top-full right-0 mt-2 w-32 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-[100] flex flex-col">
+                      <div className="absolute top-full right-0 mt-2 w-32 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-xl overflow-hidden z-100 flex flex-col">
                         <button
                           onClick={() => {
                             exportAsReact(files!);
@@ -387,7 +387,7 @@ function ReactBuilderContent() {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-white/40">
               {isGenerating ? (
-                <div className="max-w-[360px] w-[90vw] flex justify-center z-[100] mx-4 drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                <div className="max-w-[360px] w-[90vw] flex justify-center z-100 mx-4 drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]">
                   <MainGenerationProgress
                     steps={agentSteps}
                     architectData={architectData}
@@ -424,7 +424,7 @@ function ReactBuilderContent() {
 
           {/* Fullscreen Preview Overlay */}
           {fullscreen && files && (
-            <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+            <div className="fixed inset-0 z-100 bg-black flex flex-col">
               <div className="h-12 bg-neutral-900 border-b border-white/10 flex items-center justify-between px-4 shrink-0">
                 <span className="text-white/60 text-sm font-medium">
                   Full-Screen Preview

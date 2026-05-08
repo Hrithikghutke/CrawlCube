@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 
-import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import StatsBar from "@/components/landing/StatsBar";
-import Showcase from "@/components/landing/Showcase";
-import HowItWorks from "@/components/landing/HowItWorks";
+import Navbar from "@/components/landing/website/Navbar";
+import Hero from "@/components/landing/website/Hero";
+import StatsBar from "@/components/landing/website/StatsBar";
+import Showcase from "@/components/landing/website/Showcase";
+import HowItWorks from "@/components/landing/website/HowItWorks";
 
-import FinalCTA from "@/components/landing/FinalCTA";
-import Footer from "@/components/landing/Footer";
-import InspirationSection from "@/components/landing/InspirationSection";
-import SEOPerformance from "@/components/landing/SEOPerformance";
+import FinalCTA from "@/components/landing/website/FinalCTA";
+import Footer from "@/components/landing/website/Footer";
+import InspirationSection from "@/components/landing/website/InspirationSection";
+import SEOPerformance from "@/components/landing/website/SEOPerformance";
 
 export const metadata: Metadata = {
   title:
