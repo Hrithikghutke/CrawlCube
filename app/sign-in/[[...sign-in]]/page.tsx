@@ -68,6 +68,8 @@ export default function SignInPage() {
         </div>
 
         <SignIn
+          fallbackRedirectUrl="/home"
+          forceRedirectUrl="/home"
           appearance={{
             baseTheme: dark,
             variables: {

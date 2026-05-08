@@ -40,7 +40,7 @@ export default function SignUpPage() {
   return (
     <main className="min-h-screen bg-black flex overflow-hidden relative">
       {/* Left Column - Visuals */}
-      <div className="hidden lg:flex flex-1 relative bg-gradient-to-bl from-neutral-800 to-black items-end justify-center overflow-hidden">
+      <div className="hidden lg:flex flex-1 relative bg-linear-to-bl from-neutral-800 to-black items-end justify-center overflow-hidden">
         {/* Background Isometric Logo - Large, filling center-bottom of left panel */}
         <div className="absolute inset-0 z-0 flex items-end justify-start pointer-events-none">
           <Image
@@ -54,7 +54,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Bottom Prompt Box */}
-        <div className="flex flex-col items-center justify-center w-[100%]">
+        <div className="flex flex-col items-center justify-center w-full">
           <div className="flex flex-col items-center justify-center pb-7">
             <h2 className="text-3xl opacity-90 font-bold text-white">
               Turn your ideas into Reality.
@@ -102,7 +102,7 @@ export default function SignUpPage() {
 
         {/* Loading skeleton - shown while Clerk JS loads */}
         {!clerkLoaded && (
-          <div className="w-full max-w-[420px] relative z-10 absolute">
+          <div className="w-full max-w-[420px] relative z-10 ">
             <div className="flex flex-col items-center gap-5 p-8 animate-pulse">
               <div className="w-12 h-12 rounded-xl bg-white/10" />
               <div className="flex flex-col items-center gap-2">
@@ -129,6 +129,8 @@ export default function SignUpPage() {
         )}
 
         <SignUp
+          fallbackRedirectUrl="/home"
+          forceRedirectUrl="/home"
           appearance={{
             baseTheme: dark,
             variables: {
