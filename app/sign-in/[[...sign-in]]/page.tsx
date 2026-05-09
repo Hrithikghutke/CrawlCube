@@ -19,7 +19,7 @@ export default function SignInPage() {
             alt="Crawl Cube Background Pattern"
             width={700}
             height={700}
-            className="object-contain opacity-100 "
+            className="object-contain opacity-20 "
             priority
           />
         </div>
@@ -73,7 +73,7 @@ export default function SignInPage() {
           appearance={{
             baseTheme: dark,
             variables: {
-              colorBackground: "transparent",
+              colorBackground: "var(--color-secondary)",
             },
             elements: {
               rootBox: "w-full max-w-[420px] relative z-10",
@@ -82,7 +82,7 @@ export default function SignInPage() {
                 border: "none",
                 boxShadow: "none",
                 outline: "none",
-                backgroundColor: "transparent",
+                backgroundColor: "var(--color-secondary)",
               },
               headerTitle:
                 "text-2xl font-bold font-sans text-white text-center",

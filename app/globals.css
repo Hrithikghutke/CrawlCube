@@ -43,7 +43,7 @@ html {
 
   /* Secondary: Complementary panels, cards, subtle fills */
   --brand-secondary: #f1f5f9;
-  --brand-secondary-dark: #1e293b;
+  --brand-secondary-dark: #181818;
   --brand-secondary-foreground: #0f172a;
   --brand-secondary-foreground-dark: #f8fafc;
 
@@ -55,7 +55,7 @@ html {
 
   /* Muted: Disabled states, placeholder text, subtle labels */
   --brand-muted: #f1f5f9;
-  --brand-muted-dark: #1e293b;
+  --brand-muted-dark: #272727;
   --brand-muted-foreground: #64748b;
   --brand-muted-foreground-dark: #94a3b8;
 

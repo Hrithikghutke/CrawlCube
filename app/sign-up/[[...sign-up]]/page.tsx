@@ -38,7 +38,7 @@ export default function SignUpPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black flex overflow-hidden relative">
+    <main className="min-h-screen bg-background flex overflow-hidden relative">
       {/* Left Column - Visuals */}
       <div className="hidden lg:flex flex-1 relative bg-linear-to-bl from-neutral-800 to-black items-end justify-center overflow-hidden">
         {/* Background Isometric Logo - Large, filling center-bottom of left panel */}
@@ -48,7 +48,7 @@ export default function SignUpPage() {
             alt="Crawl Cube Background Pattern"
             width={700}
             height={700}
-            className="object-contain opacity-100 "
+            className="object-contain opacity-20 "
             priority
           />
         </div>
@@ -134,7 +134,7 @@ export default function SignUpPage() {
           appearance={{
             baseTheme: dark,
             variables: {
-              colorBackground: "transparent",
+              colorBackground: "var(--color-secondary)",
             },
             elements: {
               rootBox: "w-full max-w-[420px] relative z-10",
@@ -143,7 +143,7 @@ export default function SignUpPage() {
                 border: "none",
                 boxShadow: "none",
                 outline: "none",
-                backgroundColor: "transparent",
+                backgroundColor: "var(--color-secondary)",
               },
               headerTitle:
                 "text-2xl font-bold font-sans text-white text-center",
