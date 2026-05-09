@@ -24,7 +24,7 @@ type GenerationMode = "fast" | "deep";
 
 const useTypewriter = (
   words: string[],
-  typingSpeed = 80,
+  typingSpeed = 40,
   deletingSpeed = 40,
   pause = 1800,
 ) => {
@@ -34,7 +34,7 @@ const useTypewriter = (
   const [text, setText] = useState("");
 
   useEffect(() => {
-    if (subIndex === words[index].length + 1 && isDeleting!) {
+    if (subIndex === words[index].length + 1 && !isDeleting) {
       setTimeout(() => setIsDeleting(true), pause);
       return;
     }
@@ -224,8 +224,12 @@ export default function LandingPrompt() {
 
   return (
     <div className="relative flex flex-col items-center w-full min-h-[70vh] justify-center pb-12 pt-8 sm:pt-20 px-4 md:px-0 scroll-hidden">
-      <div className="absolute top-0 left-0  -z-10">
-        <Image src={bgLogo} alt="Robot" width={850} />
+      <div className="absolute top-30 left-0 md:left-0 md:top-0 lg:left-55 lg:top-0 -z-10">
+        <Image
+          className="opacity-25 w-full scale-140 md:scale-100 lg:scale-150 "
+          src={bgLogo}
+          alt="Robot"
+        />
       </div>
 
       {/* Hero Headings */}
@@ -260,7 +264,7 @@ export default function LandingPrompt() {
       </div>
 
       {/* Input Shell */}
-      <div className="relative z-20 w-full max-w-3xl mx-auto rounded-3xl  bg-background shadow-2xl transition-colors">
+      <div className="relative z-20 w-full max-w-3xl mx-auto rounded-3xl  bg-input/50 shadow-2xl transition-colors">
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
@@ -300,7 +304,7 @@ export default function LandingPrompt() {
               </button>
 
               {showStackPicker && (
-                <div className="absolute top-full mb-2 sm:mb-0 sm:mt-2 left-0 sm:bottom-auto bottom-full w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
+                <div className="absolute top-auto bottom-full mb-2 sm:top-full sm:bottom-auto sm:mt-2 sm:mb-0 left-0 w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
                   <button
                     onClick={() => {
                       setSelectedStack("html");
@@ -346,6 +350,7 @@ export default function LandingPrompt() {
             {selectedStack === "html" && (
               <div className="relative">
                 <button
+                  suppressHydrationWarning
                   onClick={() => setShowModePicker(!showModePicker)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-background/50 hover:bg-secondary text-[11px] font-semibold text-muted-foreground transition-colors cursor-pointer"
                 >
@@ -359,7 +364,7 @@ export default function LandingPrompt() {
                 </button>
 
                 {showModePicker && (
-                  <div className="absolute top-full mt-2 left-0 w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
+                  <div className="absolute top-auto bottom-full mb-2 sm:top-full sm:bottom-auto sm:mt-2 sm:mb-0 left-0 w-48 bg-background dark:bg-[#141414] border border-border rounded-xl shadow-xl overflow-hidden z-30">
                     <button
                       onClick={() => {
                         setSelectedMode("fast");
@@ -417,7 +422,7 @@ export default function LandingPrompt() {
                   <ChevronDown className="w-3 h-3 opacity-40" />
                 </button>
                 {showModelPicker && (
-                  <div className="absolute top-full mt-2 left-0 w-[300px] bg-background dark:bg-[#1a1a1a] border border-border rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
+                  <div className="absolute top-auto bottom-full mb-2 sm:top-full sm:bottom-auto sm:mt-2 sm:mb-0 left-0 w-[300px] max-w-[90vw] bg-background dark:bg-[#1a1a1a] border border-border rounded-xl shadow-2xl z-30 p-2 overflow-hidden">
                     <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground tracking-wider">
                       {selectedStack === "react"
                         ? "REACT GENERATION"

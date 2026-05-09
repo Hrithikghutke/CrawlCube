@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Cpu, RefreshCw } from "lucide-react";
-import { AgentStep } from "../react/ReactGenerationProgress";
+import { AgentStep } from "./ReactGenerationProgress";
 
 const codeSnippets = [
   "const [isOpen, setIsOpen] = useState(false);",

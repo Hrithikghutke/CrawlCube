@@ -10,12 +10,17 @@ import FinalCTA from "../website/FinalCTA";
 
 export default function Home() {
   return (
-    <main className="h-screen flex flex-col bg-[#fafafa] dark:bg-[#000000] text-foreground transition-colors overflow-hidden relative">
-      <div className="z-10 relative flex-none">
-        <Header transparent />
-      </div>
-
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-800 scrollbar-track-transparent relative z-10">
+    <main className="min-h-screen bg-[#fafafa] dark:bg-[#000000] text-foreground transition-colors relative overflow-x-hidden">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        body { scrollbar-width: none; -ms-overflow-style: none; }
+        body::-webkit-scrollbar { display: none; }
+      `,
+        }}
+      />
+      <Header transparent />
+      <div className="relative z-10 ">
         <LandingPrompt />
         <RecentGenerations />
         <section

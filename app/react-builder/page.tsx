@@ -13,7 +13,7 @@ import {
   Globe,
 } from "lucide-react";
 import { exportAsReact, exportAsNextjs } from "@/utils/exportProject";
-import MainGenerationProgress from "@/components/builder/html/MainGenerationProgress";
+import MainGenerationProgress from "@/components/builder/react/MainGenerationProgress";
 import type { GeneratedReactFiles } from "@/types/react-generation";
 import ReactChatPanel from "@/components/builder/react/ReactChatPanel";
 import Logo from "@/assets/logo.svg";
@@ -30,6 +30,63 @@ const ReactSandpack = dynamic(
     ),
   },
 );
+
+const SpaceWarp = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <style>{`
+        @keyframes hyperspace {
+          0% { 
+            transform: rotate(var(--angle)) translateX(var(--start)) scaleX(0.1); 
+            opacity: 0; 
+          }
+          20% { 
+            opacity: var(--max-opacity); 
+          }
+          100% { 
+            transform: rotate(var(--angle)) translateX(var(--end)) scaleX(2); 
+            opacity: 0; 
+          }
+        }
+      `}</style>
+      {Array.from({ length: 120 }).map((_, i) => {
+        const angle = Math.random() * 360;
+        const start = 40 + Math.random() * 150;
+        const end = 1000 + Math.random() * 1000;
+        const duration = 0.4 + Math.random() * 1.5;
+        const delay = Math.random() * 2;
+        const length = 30 + Math.random() * 100;
+        const thickness = 0.5 + Math.random() * 1.5;
+        const opacity = 0.2 + Math.random() * 0.1;
+
+        return (
+          <div
+            key={i}
+            className="absolute top-1/2 left-1/2 bg-white rounded-full"
+            style={
+              {
+                width: `${length}px`,
+                height: `${thickness}px`,
+                transformOrigin: "left center",
+                "--angle": `${angle}deg`,
+                "--start": `${start}px`,
+                "--end": `${end}px`,
+                "--max-opacity": opacity,
+                opacity: 0,
+                animation: `hyperspace ${duration}s infinite linear ${delay}s`,
+              } as React.CSSProperties
+            }
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 function ReactBuilderContent() {
   const router = useRouter();
@@ -252,12 +309,13 @@ function ReactBuilderContent() {
             onFilesChange={handleChatFilesChange}
             initialPrompt={prompt || undefined}
             initialFiles={files}
+            // Temporarily comment this out so it doesn't revert to false immediately!
             onGenerationStateChange={handleGenerationStateChange}
           />
         </div>
 
         {/* MAIN CONTENT (ReactSandpack) */}
-        <div className="flex-1 bg-[#151515] flex flex-col min-w-0 relative w-full h-full">
+        <div className="flex-1 bg-background flex flex-col min-w-0 relative w-full h-full">
           {/* Top Toolbar overlay */}
           {files && (
             <div
@@ -385,14 +443,17 @@ function ReactBuilderContent() {
               />
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-white/40">
+            <div className="flex-1 flex flex-col items-center justify-center text-white/40 relative overflow-hidden">
               {isGenerating ? (
-                <div className="max-w-[360px] w-[90vw] flex justify-center z-100 mx-4 drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                  <MainGenerationProgress
-                    steps={agentSteps}
-                    architectData={architectData}
-                  />
-                </div>
+                <>
+                  <SpaceWarp />
+                  <div className="max-w-[360px] w-[90vw] flex justify-center z-100 mx-4 drop-shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                    <MainGenerationProgress
+                      steps={agentSteps}
+                      architectData={architectData}
+                    />
+                  </div>
+                </>
               ) : (
                 <>
                   <div className="w-16 h-16 mb-4 border border-white/10 shadow-xl rounded-2xl flex items-center justify-center bg-white/5">

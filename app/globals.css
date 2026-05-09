@@ -61,9 +61,9 @@ html {
 
   /* Border, Input outline, Focus ring */
   --brand-border: #e2e8f0;
-  --brand-border-dark: #1e293b;
+  --brand-border-dark: #252525;
   --brand-input: #e2e8f0;
-  --brand-input-dark: #1e293b;
+  --brand-input-dark: #272727;
   --brand-ring: #226ec4;
   --brand-ring-dark: #226ec4;
 
