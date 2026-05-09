@@ -60,9 +60,9 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
 
   return (
     <div ref={ref} className="flex flex-col items-center gap-3">
-      <div className="relative w-20 h-20 md:w-full md:h-full rounded-full">
+      <div className="relative w-17 h-17 md:w-full md:h-full rounded-full">
         <svg
-          className="w-20 h-20 md:w-full md:h-full -rotate-90"
+          className="w-17  h-17 md:w-full md:h-full -rotate-90"
           viewBox="0 0 96 96"
         >
           {/* Track */}
@@ -106,7 +106,7 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
         {/* Score number */}
         <div className="absolute inset-0 flex items-center justify-center">
           <span
-            className={`font-bold text-white ${isMax ? "text-xl md:text-3xl lg:text-4xl" : "text-lg md:text-2xl lg:text-3xl"}`}
+            className={`font-bold text-white ${isMax ? "text-lg md:text-3xl lg:text-4xl" : "text-md md:text-2xl lg:text-3xl"}`}
           >
             {animatedScore}
           </span>
@@ -200,7 +200,7 @@ function Sparkline() {
 
 export default function SEOPerformance() {
   return (
-    <section className="py-20 px-6 md:px-4 sm:px-6">
+    <section className="py-10 md:py-20 px-6 md:px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         {/* ── Section Heading ── */}
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-16">

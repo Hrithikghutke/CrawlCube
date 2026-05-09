@@ -71,12 +71,12 @@ const InfiniteInspiration = () => {
   ];
 
   return (
-    <section className="bg-zigzag-pattern relative bg-foreground py-20 overflow-hidden rounded-4xl">
+    <section className="bg-zigzag-pattern relative bg-foreground py-15 md:py-20 lg:py-20 overflow-hidden rounded-4xl">
       <style>{scrollStyles}</style>
 
       {/* Header - Kept in container */}
-      <div className="max-w-6xl mx-auto px-6 mb-16">
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-secondary mb-4 ">
+      <div className="max-w-6xl mx-auto px-6 mb-8 md:mb-8 lg:mb-16">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-secondary mb-4  ">
           Get <span className="font-display text-primary">inspired.</span>
         </h2>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">

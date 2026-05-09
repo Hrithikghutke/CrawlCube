@@ -51,7 +51,7 @@ export default function Hero() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(rgba(206, 205, 205, 0.09) 1px, transparent 1px)",
+            "radial-gradient(rgba(206, 205, 205, 0.09) 1px, transparent 1.1px)",
           backgroundSize: "32px 32px",
         }}
       />
@@ -62,7 +62,7 @@ export default function Hero() {
           alt="Crawl Cube Background Pattern"
           width={900}
           height={900}
-          className="object-contain opacity-100"
+          className="object-contain scale-150 lg:scale-120 opacity-20"
           priority
         />
       </div>
