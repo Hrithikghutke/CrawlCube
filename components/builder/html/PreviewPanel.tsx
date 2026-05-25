@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import PreviewFrame from "@/components/builder/html/PreviewFrame";
 import DeepPreview from "@/components/builder/html/DeepPreview";
 import ElementEditorPanel from "@/components/ui/ElementEditorPanel";
+import NetlifyConnectModal from "@/components/dashboard/NetlifyConnectModal";
 import { Layout } from "@/types/layout";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
@@ -112,6 +113,7 @@ export default function PreviewPanel({
   isGenerating,
   onToggleChat,
   isChatPanelHidden,
+  initialDeployedUrl,
 }: {
   layout: Layout | null;
   deepHtml?: string | null;
@@ -127,6 +129,7 @@ export default function PreviewPanel({
   isGenerating?: boolean;
   onToggleChat?: () => void;
   isChatPanelHidden?: boolean;
+  initialDeployedUrl?: string | null;
 }) {
   const { resolvedTheme } = useTheme();
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
@@ -150,8 +153,15 @@ export default function PreviewPanel({
   }, [deepHtml]);
   const codeEndRef = useRef<HTMLDivElement>(null);
   const [deploying, setDeploying] = useState(false);
-  const [deployedUrl, setDeployedUrl] = useState<string | null>(null);
+  const [deployedUrl, setDeployedUrl] = useState<string | null>(initialDeployedUrl ?? null);
   const [deployCopied, setDeployCopied] = useState(false);
+  const [showNetlifyConnectModal, setShowNetlifyConnectModal] = useState(false);
+
+  useEffect(() => {
+    if (initialDeployedUrl) {
+      setDeployedUrl(initialDeployedUrl);
+    }
+  }, [initialDeployedUrl]);
 
   // Auto-switch to Code tab when generation starts
   useEffect(() => {
@@ -658,6 +668,16 @@ export default function PreviewPanel({
   // ── Deploy to Netlify ──
   const handleDeploy = async () => {
     if (!deepHtml || deploying) return;
+    
+    // Check connection first
+    const connRes = await fetch("/api/netlify/check-connection");
+    const { connected } = await connRes.json();
+
+    if (!connected) {
+      setShowNetlifyConnectModal(true);
+      return;
+    }
+
     setDeploying(true);
 
     try {
@@ -673,6 +693,11 @@ export default function PreviewPanel({
 
       const data = await res.json();
 
+      if (data.error === "netlify_token_expired") {
+        setShowNetlifyConnectModal(true);
+        return;
+      }
+
       if (data.error === "SUBSCRIPTION_REQUIRED") {
         alert(
           "Deploy is available for subscribers only. Upgrade your plan to publish your site.",
@@ -683,6 +708,7 @@ export default function PreviewPanel({
       if (!res.ok || !data.url) throw new Error(data.error ?? "Deploy failed");
 
       setDeployedUrl(data.url);
+      sessionStorage.setItem("crawlcube_deployedUrl", data.url);
     } catch (err: any) {
       console.error("[Deploy] Failed:", err);
       alert("Deploy failed. Please try again.");
@@ -752,18 +778,41 @@ export default function PreviewPanel({
             </button>
           )}
 
-          <div className="flex items-center gap-3 bg-transparent dark:bg-[#161616] border border-neutral-300 dark:border-white/10 rounded-xl px-4 py-2 flex-1 max-w-xs shadow-sm">
-            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate">
-              {urlBarName}.crawlcube.app
-            </span>
-            {/* Deep Dive badge in toolbar */}
-            {isDeepMode && (
-              <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full shrink-0">
-                <Telescope className="w-3 h-3" />
-                Deep
+          {deployedUrl ? (
+            <div className="flex items-center gap-3 bg-transparent dark:bg-[#161616] border border-neutral-300 dark:border-white/10 rounded-xl px-4 py-2 flex-1 max-w-xs shadow-sm">
+              <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate" title={deployedUrl}>
+                {new URL(deployedUrl).hostname}
               </span>
-            )}
-          </div>
+              {isDeepMode && (
+                <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full shrink-0">
+                  <Telescope className="w-3 h-3" />
+                  Deep
+                </span>
+              )}
+              <a
+                href={deployedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${isDeepMode ? 'ml-1' : 'ml-auto'} flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-0.5 rounded-full shrink-0 transition-colors cursor-pointer`}
+              >
+                <Globe className="w-3 h-3" />
+                Live
+              </a>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 bg-transparent dark:bg-[#161616] border border-neutral-300 dark:border-white/10 rounded-xl px-4 py-2 flex-1 max-w-xs shadow-sm">
+              <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 truncate">
+                {urlBarName}.crawlcube.app
+              </span>
+              {/* Deep Dive badge in toolbar */}
+              {isDeepMode && (
+                <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold text-pink-400 bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 rounded-full shrink-0">
+                  <Telescope className="w-3 h-3" />
+                  Deep
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action buttons */}
@@ -1060,6 +1109,11 @@ export default function PreviewPanel({
           </div>
         )}
       </div>
+
+      <NetlifyConnectModal 
+        isOpen={showNetlifyConnectModal}
+        onClose={() => setShowNetlifyConnectModal(false)}
+      />
     </div>
   );
 }

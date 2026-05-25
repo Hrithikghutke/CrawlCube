@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getUserSubscription, saveDeployedUrl } from "@/lib/firestore";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -9,6 +11,7 @@ export async function POST(req: Request) {
   }
 
   // Subscribers only
+  /*
   const sub = await getUserSubscription(userId);
   const now = new Date();
   const endDate = sub?.subscriptionEndDate
@@ -27,6 +30,7 @@ export async function POST(req: Request) {
       { status: 403 },
     );
   }
+  */
 
   const { html, siteName, generationId } = await req.json();
 
@@ -34,27 +38,69 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No HTML provided" }, { status: 400 });
   }
 
-  try {
-    // ── Step 1: Create a new Netlify site ──
-    const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: slugify(siteName ?? "crawlcube-site"),
-      }),
-    });
+  const userDoc = await getDoc(doc(db, "users", userId));
+  const userData = userDoc.data();
+  const netlifyToken = userData?.netlifyAccessToken ?? process.env.NETLIFY_ACCESS_TOKEN ?? process.env.NETLIFY_TOKEN;
 
-    if (!siteRes.ok) {
-      const err = await siteRes.json();
-      console.error("[Netlify] Site creation failed:", err);
-      throw new Error("Failed to create Netlify site");
+  try {
+    let siteId = "";
+    let siteSubdomain = "";
+
+    // ── Step 1: Resolve Netlify site (reuse or create) ──
+    if (generationId) {
+      const genDoc = await getDoc(doc(db, "generations", generationId));
+      if (genDoc.exists() && genDoc.data().netlifySiteId) {
+        const existingSiteId = genDoc.data().netlifySiteId;
+        // Verify the site still exists
+        const checkRes = await fetch(`https://api.netlify.com/api/v1/sites/${existingSiteId}`, {
+          headers: {
+            Authorization: `Bearer ${netlifyToken}`,
+          },
+        });
+        if (checkRes.ok) {
+          const site = await checkRes.json();
+          siteId = site.id;
+          siteSubdomain = site.subdomain;
+        }
+      }
     }
 
-    const site = await siteRes.json();
-    const siteId = site.id;
+    if (!siteId) {
+      // Create a new Netlify site
+      const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${netlifyToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: slugify(siteName ?? "crawlcube-site"),
+        }),
+      });
+
+      if (!siteRes.ok) {
+        if (siteRes.status === 401 && userData?.netlifyAccessToken) {
+          await updateDoc(doc(db, "users", userId), {
+            netlifyAccessToken: null,
+            netlifyConnectedAt: null,
+          });
+          return NextResponse.json(
+            {
+              error: "netlify_token_expired",
+              message: "Please reconnect your Netlify account.",
+            },
+            { status: 401 },
+          );
+        }
+        const err = await siteRes.json();
+        console.error("[Netlify] Site creation failed:", err);
+        throw new Error("Failed to create Netlify site");
+      }
+
+      const site = await siteRes.json();
+      siteId = site.id;
+      siteSubdomain = site.subdomain;
+    }
 
     // ── Step 2: Deploy HTML as a file digest ──
     // Netlify expects files as a zip or via their Files API
@@ -73,7 +119,7 @@ export async function POST(req: Request) {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${netlifyToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -98,7 +144,7 @@ export async function POST(req: Request) {
       {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${netlifyToken}`,
           "Content-Type": "application/octet-stream",
         },
         body: htmlBytes,
@@ -112,7 +158,7 @@ export async function POST(req: Request) {
     }
 
     // ── Step 4: Poll until deploy is ready (max 30s) ──
-    let deployedUrl = `https://${site.subdomain}.netlify.app`;
+    let deployedUrl = `https://${siteSubdomain}.netlify.app`;
     let attempts = 0;
 
     while (attempts < 15) {
@@ -121,7 +167,7 @@ export async function POST(req: Request) {
         `https://api.netlify.com/api/v1/deploys/${deployId}`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${netlifyToken}`,
           },
         },
       );
@@ -131,7 +177,7 @@ export async function POST(req: Request) {
       );
 
       if (status.state === "ready") {
-        deployedUrl = `https://${status.ssl_url?.replace("https://", "") ?? site.subdomain + ".netlify.app"}`;
+        deployedUrl = `https://${status.ssl_url?.replace("https://", "") ?? siteSubdomain + ".netlify.app"}`;
         break;
       }
       if (status.state === "error") {
@@ -142,7 +188,7 @@ export async function POST(req: Request) {
 
     // ── Step 5: Save URL to Firestore if generationId provided ──
     if (generationId) {
-      await saveDeployedUrl(generationId, userId, deployedUrl);
+      await saveDeployedUrl(generationId, userId, deployedUrl, siteId);
     }
 
     console.log(`[Netlify] Deployed successfully: ${deployedUrl}`);

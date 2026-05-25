@@ -113,6 +113,7 @@ function ReactBuilderContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [agentSteps, setAgentSteps] = useState<any[]>([]);
   const [architectData, setArchitectData] = useState<any>(null);
+  const [deployedUrl, setDeployedUrl] = useState<string | null>(null);
 
   const handleDeploy = async () => {
     if (!files) return;
@@ -121,10 +122,14 @@ function ReactBuilderContent() {
       const res = await fetch("/api/netlify/deploy-react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ files, siteName: "react-app" }),
+        body: JSON.stringify({ files, siteName: "react-app", generationId: continueId || undefined }),
       });
       const data = await res.json();
-      if (data.url) window.open(data.url, "_blank");
+      if (data.url) {
+        setDeployedUrl(data.url);
+        sessionStorage.setItem("crawlcube_react_deployedUrl", data.url);
+        window.open(data.url, "_blank");
+      }
       else alert(data.error || "Deploy failed");
     } catch (e) {
       alert("Deploy failed");
@@ -184,6 +189,10 @@ function ReactBuilderContent() {
             setFiles(data.generation.reactFiles);
             setPrompt(data.generation.prompt);
           }
+          if (data?.generation?.deployedUrl) {
+            setDeployedUrl(data.generation.deployedUrl);
+            sessionStorage.setItem("crawlcube_react_deployedUrl", data.generation.deployedUrl);
+          }
         })
         .finally(() => setInitLoading(false));
       return;
@@ -203,6 +212,11 @@ function ReactBuilderContent() {
       } catch (e) {
         sessionStorage.removeItem("crawlcube_react_files");
       }
+    }
+    
+    const savedUrl = sessionStorage.getItem("crawlcube_react_deployedUrl");
+    if (savedUrl) {
+      setDeployedUrl(savedUrl);
     }
   }, [continueId]);
 
@@ -369,6 +383,22 @@ function ReactBuilderContent() {
               {/* Right Actions */}
               <div className="flex md:flex-1 md:justify-end shrink-0">
                 <div className="flex items-center gap-2">
+                  {deployedUrl && (
+                    <div className="items-center gap-3 bg-transparent border border-white/10 rounded-md px-2 py-1 shadow-sm hidden lg:flex mr-2">
+                      <span className="text-xs font-medium text-neutral-300 truncate max-w-[120px]" title={deployedUrl}>
+                        {new URL(deployedUrl).hostname}
+                      </span>
+                      <a
+                        href={deployedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 px-2 py-0.5 rounded-full shrink-0 transition-colors cursor-pointer"
+                      >
+                        <Globe className="w-3 h-3" />
+                        Live
+                      </a>
+                    </div>
+                  )}
                   <button
                     onClick={() => setFullscreen(true)}
                     className="p-1.5 text-neutral-400 hover:text-white border border-white/10 hover:bg-white/5 rounded-lg transition-colors hidden md:block"

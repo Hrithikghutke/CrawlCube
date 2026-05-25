@@ -496,7 +496,7 @@ export default function ReactChatPanel({
             className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
           >
             {m.role === "user" ? (
-              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] text-wrap">
+              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] whitespace-pre-wrap wrap-break-word overflow-hidden">
                 {m.content}
                 {m.questions && m.questions.length > 0 && (
                   <div className="mt-4">
@@ -510,7 +510,7 @@ export default function ReactChatPanel({
               </div>
             ) : (
               <div className="w-full">
-                <p className="text-foreground/80 font-medium mb-3">
+                <p className="text-foreground/80 font-medium mb-3 whitespace-pre-wrap wrap-break-word">
                   {m.content}
                 </p>
                 {m.questions && m.questions.length > 0 && (

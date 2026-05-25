@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getUserSubscription, saveDeployedUrl } from "@/lib/firestore";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import * as esbuild from "esbuild";
 import path from "path";
 import os from "os";
@@ -16,6 +18,7 @@ export async function POST(req: Request) {
   }
 
   // Subscribers only
+  /*
   const sub = await getUserSubscription(userId);
   const now = new Date();
   const endDate = sub?.subscriptionEndDate
@@ -34,12 +37,17 @@ export async function POST(req: Request) {
       { status: 403 },
     );
   }
+  */
 
   const { files, siteName, generationId } = await req.json();
 
   if (!files || Object.keys(files).length === 0) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
+
+  const userDoc = await getDoc(doc(db, "users", userId));
+  const userData = userDoc.data();
+  const netlifyToken = userData?.netlifyAccessToken ?? process.env.NETLIFY_ACCESS_TOKEN ?? process.env.NETLIFY_TOKEN;
 
   // Create workspace in system temp
   const workDir = path.join(os.tmpdir(), `crawlcube-build-${crypto.randomUUID()}`);
@@ -143,22 +151,57 @@ export async function POST(req: Request) {
     const htmlBytes = encoder.encode(indexHtml);
 
     // 4. Deploy to Netlify
-    // Step 4a: Create site
-    // Step 4a: Create site
-    const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: slugify(siteName ?? "crawlcube-react"),
-      }),
-    });
+    let siteId = "";
+    let siteSubdomain = "";
 
-    if (!siteRes.ok) throw new Error("Failed to create Netlify site");
-    const site = await siteRes.json();
-    const siteId = site.id;
+    // Step 4a: Resolve Netlify site (reuse or create)
+    if (generationId) {
+      const genDoc = await getDoc(doc(db, "generations", generationId));
+      if (genDoc.exists() && genDoc.data().netlifySiteId) {
+        const existingSiteId = genDoc.data().netlifySiteId;
+        const checkRes = await fetch(`https://api.netlify.com/api/v1/sites/${existingSiteId}`, {
+          headers: { Authorization: `Bearer ${netlifyToken}` },
+        });
+        if (checkRes.ok) {
+          const site = await checkRes.json();
+          siteId = site.id;
+          siteSubdomain = site.subdomain;
+        }
+      }
+    }
+
+    if (!siteId) {
+      const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${netlifyToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: slugify(siteName ?? "crawlcube-react"),
+        }),
+      });
+
+      if (!siteRes.ok) {
+        if (siteRes.status === 401 && userData?.netlifyAccessToken) {
+          await updateDoc(doc(db, "users", userId), {
+            netlifyAccessToken: null,
+            netlifyConnectedAt: null,
+          });
+          return NextResponse.json(
+            {
+              error: "netlify_token_expired",
+              message: "Please reconnect your Netlify account.",
+            },
+            { status: 401 },
+          );
+        }
+        throw new Error("Failed to create Netlify site");
+      }
+      const site = await siteRes.json();
+      siteId = site.id;
+      siteSubdomain = site.subdomain;
+    }
 
     // Step 4b: Calculate SHA1
     const bundleHash = crypto.createHash('sha1').update(bundleBytes).digest('hex');
@@ -183,7 +226,7 @@ export async function POST(req: Request) {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${netlifyToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -206,7 +249,7 @@ export async function POST(req: Request) {
             {
               method: "PUT",
               headers: {
-                Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}`,
+                Authorization: `Bearer ${netlifyToken}`,
                 "Content-Type": "application/octet-stream",
               },
               body: Buffer.from(bytes),
@@ -221,7 +264,7 @@ export async function POST(req: Request) {
     if (cssBytes.length > 0 && requiredFiles.includes(mappedFiles["/bundle.css"])) await uploadFile("/bundle.css", cssBytes);
 
     // Step 4c: Wait for Readiness
-    let deployedUrl = `https://${site.subdomain}.netlify.app`;
+    let deployedUrl = `https://${siteSubdomain}.netlify.app`;
     let attempts = 0;
 
     while (attempts < 15) {
@@ -229,12 +272,12 @@ export async function POST(req: Request) {
       const statusRes = await fetch(
         `https://api.netlify.com/api/v1/deploys/${deployId}`,
         {
-          headers: { Authorization: `Bearer ${process.env.NETLIFY_ACCESS_TOKEN}` },
+          headers: { Authorization: `Bearer ${netlifyToken}` },
         },
       );
       const status = await statusRes.json();
       if (status.state === "ready") {
-        deployedUrl = `https://${status.ssl_url?.replace("https://", "") ?? site.subdomain + ".netlify.app"}`;
+        deployedUrl = `https://${status.ssl_url?.replace("https://", "") ?? siteSubdomain + ".netlify.app"}`;
         break;
       }
       if (status.state === "error") throw new Error("Netlify deploy failed");
@@ -242,7 +285,7 @@ export async function POST(req: Request) {
     }
 
     if (generationId) {
-      await saveDeployedUrl(generationId, userId, deployedUrl);
+      await saveDeployedUrl(generationId, userId, deployedUrl, siteId);
     }
 
     return NextResponse.json({ success: true, url: deployedUrl });
