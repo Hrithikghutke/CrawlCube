@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import LiveThumbnail from "@/components/dashboard/LiveThumbnail";
-import NetlifyConnectionStatus from "@/components/dashboard/NetlifyConnectionStatus";
 
 interface Generation {
   id: string;
@@ -56,15 +55,6 @@ export default function Dashboard({ data }: any) {
 
   useEffect(() => {
     fetchGenerations();
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("netlify") === "connected") {
-      window.history.replaceState({}, "", "/dashboard");
-      alert("Netlify account connected successfully!");
-    } else if (params.get("netlify") === "error") {
-      window.history.replaceState({}, "", "/dashboard");
-      alert("Failed to connect Netlify. Please try again.");
-    }
   }, []);
 
   const fetchGenerations = async () => {
@@ -115,11 +105,6 @@ export default function Dashboard({ data }: any) {
       <Header />
 
       <div className="max-w-6xl mx-auto w-full px-6 py-10">
-        {/* Settings / Integrations */}
-        <div className="mb-8">
-          <NetlifyConnectionStatus />
-        </div>
-
         {/* Page header */}
         <div className="flex items-center justify-between mb-8">
           <div>

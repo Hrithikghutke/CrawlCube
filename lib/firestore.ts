@@ -319,7 +319,6 @@ export async function saveDeployedUrl(
   docId: string,
   clerkUserId: string,
   deployedUrl: string,
-  siteId?: string,
 ): Promise<void> {
   const ref = doc(db, "generations", docId);
   const snap = await getDoc(ref);
@@ -327,16 +326,10 @@ export async function saveDeployedUrl(
   if (!snap.exists()) throw new Error("Not found");
   if (snap.data().clerkUserId !== clerkUserId) throw new Error("Unauthorized");
 
-  const updateData: any = {
+  await updateDoc(ref, {
     deployedUrl,
     deployedAt: serverTimestamp(),
-  };
-
-  if (siteId) {
-    updateData.netlifySiteId = siteId;
-  }
-
-  await updateDoc(ref, updateData);
+  });
 }
 
 /* -------------------------------------------------------

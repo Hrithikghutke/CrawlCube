@@ -27,7 +27,6 @@ export default function BuildPage() {
   const [showChatPanel, setShowChatPanel] = useState(true);
   const [ready, setReady] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
-  const [initialDeployedUrl, setInitialDeployedUrl] = useState<string | null>(null);
   const [initialModel, setInitialModel] = useState(
     "anthropic/claude-haiku-4.5",
   );
@@ -107,11 +106,6 @@ export default function BuildPage() {
           setInitialPrompt(gen.prompt ?? "");
           setCurrentPrompt(gen.prompt ?? "");
 
-          if (gen.deployedUrl) {
-            setInitialDeployedUrl(gen.deployedUrl);
-            sessionStorage.setItem("crawlcube_deployedUrl", gen.deployedUrl);
-          }
-
           if (gen.deepHtml) {
             // Restore Deep Dive
             setDeepHtml(gen.deepHtml);
@@ -177,12 +171,6 @@ export default function BuildPage() {
     const storedSavedId = sessionStorage.getItem("crawlcube_savedId");
     if (storedSavedId) {
       setSavedId(storedSavedId);
-    }
-    
-    // Restore deployedUrl
-    const storedDeployedUrl = sessionStorage.getItem("crawlcube_deployedUrl");
-    if (storedDeployedUrl) {
-      setInitialDeployedUrl(storedDeployedUrl);
     }
 
     setReady(true);
@@ -289,7 +277,6 @@ export default function BuildPage() {
     sessionStorage.removeItem("crawlcube_messages");
     sessionStorage.removeItem("crawlcube_brief");
     sessionStorage.removeItem("crawlcube_savedId");
-    sessionStorage.removeItem("crawlcube_deployedUrl");
   };
 
   const handleLayoutChange = (updated: Layout) => {
@@ -489,7 +476,6 @@ export default function BuildPage() {
             deepBrandName={deepBrandName}
             prompt={currentPrompt}
             savedId={savedId}
-            initialDeployedUrl={initialDeployedUrl}
             onSaved={(id) => {
               setSavedId(id);
               setIsSaved(true);
@@ -553,7 +539,6 @@ export default function BuildPage() {
                 deepBrandName={deepBrandName}
                 prompt={currentPrompt}
                 savedId={savedId}
-                initialDeployedUrl={initialDeployedUrl}
                 onSaved={(id) => {
                   setSavedId(id);
                   setIsSaved(true);
