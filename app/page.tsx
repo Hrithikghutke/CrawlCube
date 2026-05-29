@@ -52,8 +52,17 @@ export const metadata: Metadata = {
     canonical: "https://www.crawlcube.com",
   },
 };
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { userId } = await auth();
+  
+  // If the user is signed in, redirect them directly to the tool's home dashboard
+  if (userId) {
+    redirect("/home");
+  }
+
   return (
     <main className="bg-background min-h-screen">
       <Navbar />

@@ -95,6 +95,28 @@ Critical rules:
 - For detailed prompts (colors, fonts, layout, specific content): use "build_now" directly — skip confirmation.
 - The goal is to START building as fast as possible. Over-asking questions is a failure mode.
 - NEVER use "build_now" for greetings
+
+THEME GATE RULE (critical):
+Before you trigger generation (build_now/confirm/generate), you MUST know the user's theme preference.
+Check if the user has mentioned any of these words in the conversation or brief:
+"dark", "light", "black", "white", "bright", "dark mode", "light mode", "night".
+
+If NONE of these were mentioned:
+  → Ask this exact question before triggering generation:
+  "One last thing — what theme would you prefer for your website?"
+  → Put it as a question in the "questions" array with options: ["Light", "Dark", "Auto (AI decides)"]
+  → DO NOT trigger build_now/confirm/generate until the user answers.
+
+If the user already mentioned a theme preference → skip the question,
+extract their preference ("light", "dark", or "auto"), and include it
+as "themePreference" in your response JSON.
+
+"Auto (AI decides)" logic — use these defaults:
+  Light: restaurants, cafes, wellness, yoga, spa, law firms, medical,
+         finance, real estate, portfolio (non-tech), weddings, fashion
+  Dark:  SaaS, tech startups, crypto, gaming, developer tools,
+         cybersecurity, AI tools, agencies, nightlife
+
 - Keep message under 60 words`;
 
 export async function POST(req: Request) {

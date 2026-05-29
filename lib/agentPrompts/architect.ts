@@ -25,8 +25,29 @@ export interface ArchitectOutput {
   pageLabels: string[];
 }
 
-export function getArchitectPrompt(): string {
+export function getArchitectPrompt(resolvedTheme?: string): string {
+  const themeConstraint = resolvedTheme
+    ? `
+THEME CONSTRAINT (non-negotiable, override everything else):
+The user has selected theme: ${resolvedTheme}
+
+If "light":
+  - Background must be white, off-white (#fafaf8, #f5f0eb) or very light gray
+  - Text must be dark (near-black or deep gray)
+  - No dark backgrounds anywhere on the page
+  - Accent colors must be muted, warm, or professional — not neon
+
+If "dark":
+  - Background must be black (#000), near-black (#0a0a0a) or very deep color
+  - Text must be white or very light
+  - No light backgrounds anywhere on the page
+
+This is a HARD constraint. Do not deviate from it regardless of brand type.
+`
+    : "";
+
   return `You are a senior brand architect. Analyze the business and return a complete brand plan as raw JSON only. No markdown, no backticks, no explanation — ONLY the JSON object.
+${themeConstraint}
 
 Return EXACTLY this shape:
 {
@@ -48,7 +69,14 @@ Return EXACTLY this shape:
     "monoUrl": "<full CDN link tag to load the mono font>"
   },
   "pages": ["home", "<page2_id>", "<page3_id>", "contact"],
-  "pageLabels": ["Home", "<Page 2 Label>", "<Page 3 Label>", "Contact"]
+  "pageLabels": ["Home", "<Page 2 Label>", "<Page 3 Label>", "Contact"],
+  "creativeDecisions": {
+    "navbarDetail": "what specific personality detail and why it fits this brand",
+    "heroTreatment": "which hero pattern chosen and the reasoning",
+    "typographyMoment": "where and how oversized typography is used",
+    "statsDisplay": "how stats/numbers are displayed",
+    "aboveFoldElements": ["element1", "element2", "element3"]
+  }
 }
 
 VISUAL MOOD RULES — pick based on business type:
@@ -78,6 +106,62 @@ PAGES RULES:
   E-commerce → "products", "about"
 - Page IDs: lowercase, hyphen-separated (e.g. "practice-areas")
 - pageLabels: title-case human readable (e.g. "Practice Areas")
+
+════════════════════════════════════════════════════════
+MANDATORY CREATIVE DECISIONS — ALL 5 REQUIRED
+════════════════════════════════════════════════════════
+You MUST make an explicit creative decision in each of these 5 categories.
+Each decision must be appropriate for THIS specific brand.
+Do not use the same solution for different brands.
+State each decision clearly in your output under "creativeDecisions".
+
+─── CATEGORY 1: Navbar Personality Detail ───────────────
+Every navbar must have ONE typographic or visual personality detail that
+feels specific to this brand. It must NOT be generic.
+
+Choose one (or invent your own):
+  • Punctuation accent: "Sakar." / "Studio—" / "La Bella Cucina·"
+  • Mixed case: "flowdesk" all lowercase for casual brands
+  • Weight contrast: bold first word + light second word in brand name
+  • Accent color on one character or word only
+  • Tagline in small caps below or beside the brand name
+  • Minimal navbar: logo only + one word CTA (no nav links at all)
+  • Symbol/icon that is part of the logotype, not separate
+
+FORBIDDEN: A plain brand name with no personality in a standard font weight.
+
+─── CATEGORY 2: Hero Treatment ──────────────────────────
+The hero must NOT use either of these two default patterns:
+  ✗ Centered text on a gradient background
+  ✗ Left-aligned text with a floating app screenshot on the right
+
+Choose from these or invent your own:
+  • Full-bleed photography: image fills entire viewport, text overlays it
+  • Editorial split: large serif headline left, minimal content right
+  • Typography-only: massive display text IS the hero, no image
+  • Magazine cover: full-bleed portrait/product image, text at bottom or sides
+  • Architectural: stark geometry, grid lines, bold statement
+  • Asymmetric: intentionally unbalanced layout with strong visual anchor
+
+FORBIDDEN: Centered headline + subtext + two CTA buttons + gradient or
+           centered headline + subtext + floating UI screenshot on right.
+
+─── CATEGORY 3: Oversized Typography Moment ─────────────
+Every site must have ONE section where typography is used at an unexpected,
+oversized scale. This is the "wow" moment that makes the site feel designed.
+
+─── CATEGORY 4: Stats/Numbers as Visual Heroes ──────────
+If the site has statistics or numbers, they must NOT be displayed as:
+  ✗ Cards with an icon + number + label
+  ✗ A 3-column or 4-column stats grid with borders
+
+Instead display them as oversized numbers with divider lines, or numbers
+inline with large editorial text, or stacked vertically.
+
+─── CATEGORY 5: Restraint Above the Fold ────────────────
+Maximum 3 distinct elements above the fold. navbar = 1, hero content = 1,
+one supporting element = 1. No more than 2 CTA buttons above the fold.
+════════════════════════════════════════════════════════
 
 COLOR RULES — use these curated palettes. Do NOT invent random colors:
 

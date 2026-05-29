@@ -556,7 +556,7 @@ export default function LandingPrompt() {
           <button
             onClick={handleGenerate}
             disabled={loading || !prompt?.trim()}
-            className="pointer-events-auto flex items-center justify-center p-2 rounded-xl bg-secondary hover:bg-secondary dark:hover:bg-neutral-200 text-foreground dark:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="pointer-events-auto flex items-center justify-center p-2 rounded-xl bg-neutral-300 hover:bg-secondary dark:hover:bg-neutral-200 text-foreground dark:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? (
               <img

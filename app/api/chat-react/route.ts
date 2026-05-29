@@ -17,7 +17,7 @@ Your personality:
 - Ask max 2 questions at a time
 - Steer conversations naturally toward building a great website
 - Ask 1-2 clarifying questions if the prompt is vague (missing business type OR style)
-- If the prompt is detailed (colors, fonts, layout, content described), use "build_now" immediately — do NOT ask more questions
+- Even if the prompt is incredibly detailed (colors, fonts, layout, content described), you MUST STILL ASK FOR A THEME if they didn't explicitly mention one. Do not skip this!
 - Critical: NEVER use "generate" unless the user explicitly confirmed after a "confirm" message
 
 You receive:
@@ -39,28 +39,39 @@ Return ONLY a raw JSON object (no markdown, no backticks, no explanation):
 
 Action decision rules:
 
-"chat" → User is greeting, vague, or you need more info.
+█ MANDATORY THEME CHECK — BLOCKS ALL GENERATION █
+Before you can EVER return build_now, confirm, or generate:
+1. Scan the full conversation + brief for theme words: dark, light, black, white, bright, dark mode, light mode, night
+2. If NO theme word found → you MUST return action:"chat" with this question:
+   {"id": "theme", "text": "One last thing — what theme would you prefer?", "options": ["Light", "Dark", "Auto (AI decides)"]}
+3. You are FORBIDDEN from returning build_now/confirm/generate without a theme.
+4. If the user already stated a theme → extract it as "themePreference": "light"|"dark"|"auto" in your JSON.
+5. "Auto" defaults: Light for restaurants/cafes/wellness/law/medical/finance/real-estate/fashion. Dark for SaaS/tech/crypto/gaming/dev-tools/cybersecurity/AI/agencies/nightlife.
+
+"chat" → User is greeting, vague, or you need more info (INCLUDING theme — see above).
   When you need info: ALWAYS put questions in the "questions" array — NEVER embed questions in message text.
-  Max 2 questions per response. Each question needs 3-4 short chip options + "Other".
+  Max 2 questions per response. 
+  CRITICAL: You MUST provide 4 highly specific, context-aware multiple-choice options for EVERY question. NEVER provide an open-ended question without options. The user should be able to answer by simply clicking an option. Include "Other" as the 5th option.
   "message" should only be a warm intro like "Great! A few quick questions first."
 
-"build_now" → Use when you want to build a site FROM SCRATCH.
-  A) User gives a detailed prompt, OR
-  B) User has answered your clarifying questions and you now have business type + style.
+"build_now" → ONLY when you have business type + style + THEME CONFIRMED.
+  A) User gives a detailed prompt WITH theme mentioned, OR
+  B) User has answered your questions INCLUDING theme.
   CRITICAL: If hasExistingWebsite is true, NEVER return "build_now" unless the user explicitly asks to "start over", "rebuild", or "create a brand new site".
 
-"confirm" → Use when you have business type + at least one style hint, and you want to start from scratch.
+"confirm" → Use when you have business type + at least one style hint + THEME, and you want to start from scratch.
   IMPORTANT: If hasExistingWebsite is true, avoid "confirm".
 
 "generate" — user says yes/go/start after a confirm.
 
-"edit" → hasExistingWebsite is true AND user wants to change something OR is answering a clarification question about a change.
-  If the user is answering a clarification question to a previous edit request, combine the context into the "prompt" field so the edit action understands the full request!
+"edit" → hasExistingWebsite is true AND user wants to change something.
+  If the user is answering a clarification question, combine context into "prompt".
 
 Critical rules:
-- For short/vague prompts: ask questions, confirm, then build.
-- For detailed prompts: use "build_now" directly.
-- The goal is to START building as fast as possible. Over-asking questions is a failure mode.
+- For short/vague prompts: ask questions (including theme), confirm, then build.
+- For detailed prompts WITHOUT theme mentioned: ask ONLY the theme question, then build.
+- For detailed prompts WITH theme mentioned: use "build_now" directly.
+- The goal is to START building as fast as possible — but NEVER skip the theme check.
 `;
 
 export async function POST(req: Request) {
@@ -124,10 +135,44 @@ hasExistingWebsite (is there a current project in the sandbox): ${hasExistingWeb
       parsed = JSON.parse(clean);
     } catch {
       const jsonMatch = clean.match(/\{[\s\S]*\}/);
-      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+      if (jsonMatch) {
+        try {
+          parsed = JSON.parse(jsonMatch[0]);
+        } catch {
+          try {
+            const stripped = jsonMatch[0].replace(/\r?\n/g, " ");
+            parsed = JSON.parse(stripped);
+          } catch (e) {
+            console.error("Failed to parse JSON", e);
+          }
+        }
+      }
     }
 
     if (parsed && parsed.action) {
+      // Hard intercept: If the AI tries to build without a theme, force it to ask.
+      const combinedContext = (JSON.stringify(messages) + " " + (parsed.updatedBrief || brief || "")).toLowerCase();
+      const hasTheme = /\b(dark|light|auto\s*\(ai\s*decides\))\b/.test(combinedContext);
+
+      if (
+        (parsed.action === "build_now" || parsed.action === "confirm" || parsed.action === "generate") &&
+        !parsed.themePreference &&
+        !hasTheme
+      ) {
+        return NextResponse.json({
+          action: "chat",
+          message: "Almost ready! Just one final detail before I start building:",
+          questions: [
+            {
+              id: "theme",
+              text: "What theme would you prefer?",
+              options: ["Light", "Dark", "Auto (AI decides)"],
+            },
+          ],
+          updatedBrief: parsed.updatedBrief || brief,
+        });
+      }
+
       return NextResponse.json(parsed);
     }
 

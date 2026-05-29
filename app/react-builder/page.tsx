@@ -219,6 +219,9 @@ function ReactBuilderContent() {
       JSON.stringify(filesToSave),
     );
 
+    // Sync local state immediately so it doesn't revert
+    setFiles(filesToSave);
+
     setSaving(true);
     try {
       const res = await fetch("/api/generations/save", {
@@ -437,6 +440,7 @@ function ReactBuilderContent() {
                 files={files}
                 getFilesRef={getSandpackFilesRef}
                 onCodeEdit={handleCodeEdit}
+                onAutoFix={handleChatFilesChange}
                 viewMode={viewMode}
                 previewWidth={previewWidth}
                 generationKey={generationKeyRef.current}
@@ -518,6 +522,7 @@ function ReactBuilderContent() {
                   files={files}
                   getFilesRef={getSandpackFilesRef}
                   onCodeEdit={handleCodeEdit}
+                  onAutoFix={(newFiles) => setFiles(newFiles)}
                   viewMode="preview"
                   previewWidth={previewWidth}
                   generationKey={generationKeyRef.current}

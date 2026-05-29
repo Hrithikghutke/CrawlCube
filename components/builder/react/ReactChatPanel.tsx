@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Eye, RotateCcw, Clock, Box, LoaderCircle } from "lucide-react";
+import { Send, Eye, RotateCcw, Clock, Box, LoaderCircle, Square } from "lucide-react";
 import { GeneratedReactFiles } from "@/types/react-generation";
 import { DEEP_DIVE_MODELS, getModelConfig } from "@/lib/modelConfig";
 import { useCredits } from "@/context/CreditsContext";
@@ -23,6 +23,7 @@ export interface ReactMessage {
   questions?: { id: string; text: string; options: string[] }[];
   agentSteps?: AgentStep[];
   architectData?: any;
+  motionDesignerData?: any;
   createdAt: Date;
 }
 
@@ -231,6 +232,14 @@ export default function ReactChatPanel({
   const bottomRef = useRef<HTMLDivElement>(null);
   const briefRef = useRef<string>("");
   const hasAutoStarted = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const stopGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (onGenerationStateChange && messages.length > 0) {
@@ -284,78 +293,99 @@ export default function ReactChatPanel({
       createdAt: new Date(),
     };
     const aiMsgId = crypto.randomUUID();
+    
+    const initAiMsg: ReactMessage = {
+      id: aiMsgId,
+      role: "assistant",
+      content: "",
+      isGenerating: true,
+      agentSteps: [],
+      createdAt: new Date(),
+    };
 
     const lastSnapshot = [...messages]
       .reverse()
       .find((m) => m.snapshotFiles)?.snapshotFiles;
 
     if (!isAutoStart) {
-      setMessages((prev) => [...prev, userMsg]);
+      setMessages((prev) => [...prev, userMsg, initAiMsg]);
     } else {
-      setMessages([userMsg]);
+      setMessages([userMsg, initAiMsg]);
     }
 
     setInput("");
     setLoading(true);
 
     try {
+      abortControllerRef.current = new AbortController();
       let routerAction = "build_now";
       let resolvedPrompt = text;
 
-      if (!isAutoStart) {
-        const routerRes = await fetch("/api/chat-react", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: messages
-              .concat(userMsg)
-              .map((m) => ({ role: m.role, content: m.content })),
-            brief: briefRef.current,
-            hasExistingWebsite: !!lastSnapshot,
-          }),
-        });
+      const routerRes = await fetch("/api/chat-react", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: abortControllerRef.current.signal,
+        body: JSON.stringify({
+          messages: messages
+            .concat(userMsg)
+            .map((m) => ({ role: m.role, content: m.content })),
+          brief: briefRef.current,
+          hasExistingWebsite: !!lastSnapshot,
+        }),
+      });
 
-        if (!routerRes.ok) throw new Error("Chat Router failed");
-        const routerData = await routerRes.json();
+      if (!routerRes.ok) throw new Error("Chat Router failed");
+      const routerData = await routerRes.json();
 
-        if (routerData.updatedBrief) briefRef.current = routerData.updatedBrief;
+      if (routerData.updatedBrief) briefRef.current = routerData.updatedBrief;
 
-        if (routerData.action === "chat") {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: aiMsgId,
-              role: "assistant",
-              content: routerData.message || "Let me ask some questions.",
-              questions: routerData.questions,
-              createdAt: new Date(),
-            },
-          ]);
-          setLoading(false);
-          return;
-        }
-
-        routerAction = routerData.action;
-        resolvedPrompt = routerData.prompt || text;
+      if (routerData.action === "chat") {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === aiMsgId
+              ? {
+                  ...m,
+                  content: routerData.message || "Let me ask some questions.",
+                  questions: routerData.questions,
+                  isGenerating: false,
+                }
+              : m
+          )
+        );
+        setLoading(false);
+        return;
       }
 
-      const initAiMsg: ReactMessage = {
-        id: aiMsgId,
-        role: "assistant",
-        content: "",
-        isGenerating: true,
-        agentSteps: [],
-        createdAt: new Date(),
-      };
-      setMessages((prev) => [...prev, initAiMsg]);
+      routerAction = routerData.action;
+      resolvedPrompt = routerData.prompt || text;
+      if (routerData.themePreference) {
+        briefRef.current = (briefRef.current || "") + `\nTheme preference: ${routerData.themePreference}`;
+      }
+
+      // The initAiMsg is already in the messages array and has isGenerating=true.
+      // We just leave it as is so the SSE stream can update it.
+
+      // Extract theme from brief or prompt text
+      const combinedText = `${briefRef.current || ""} ${resolvedPrompt}`.toLowerCase();
+      let themePreference = "auto";
+      if (/\b(dark|dark\s*mode|dark\s*theme|black\s*background|night)\b/.test(combinedText)) {
+        themePreference = "dark";
+      } else if (/\b(light|light\s*mode|light\s*theme|white\s*background|bright|clean\s*white|minimal\s*white)\b/.test(combinedText)) {
+        themePreference = "light";
+      } else {
+        const briefTheme = briefRef.current?.match(/Theme preference:\s*(light|dark|auto)/i);
+        if (briefTheme) themePreference = briefTheme[1].toLowerCase();
+      }
 
       const res = await fetch("/api/generate-react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: abortControllerRef.current.signal,
         body: JSON.stringify({
           prompt: resolvedPrompt,
           model: selectedModel,
           existingFiles: lastSnapshot || undefined,
+          themePreference,
         }),
       });
 
@@ -397,6 +427,7 @@ export default function ReactChatPanel({
                           ...m,
                           agentSteps: existing,
                           architectData: data.architectData || m.architectData,
+                          motionDesignerData: data.motionDesignerData || m.motionDesignerData,
                         };
                       }
                       return m;
@@ -451,6 +482,16 @@ export default function ReactChatPanel({
       );
       onFilesChange(finalFiles);
     } catch (err: any) {
+      if (err.name === "AbortError") {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === aiMsgId
+              ? { ...m, content: "Generation stopped by user.", isGenerating: false }
+              : m
+          )
+        );
+        return;
+      }
       setMessages((prev) =>
         prev.map((m) =>
           m.id === aiMsgId
@@ -479,13 +520,28 @@ export default function ReactChatPanel({
   return (
     <div className="w-full md:w-[350px] shrink-0 md:border-r border-[#222] bg-[#0f0f0f] flex flex-col h-full overflow-hidden text-sm">
       {/* Header */}
-      <div className="p-4 border-b border-[#222] shrink-0 bg-background">
-        <div className="flex items-center gap-2 font-semibold text-foreground">
+      <div className="p-3 border-b border-[#222] shrink-0 bg-background flex flex-col gap-2">
+        <div className="flex items-center gap-2 font-semibold text-foreground px-1">
           React Generation{""}
           <span className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] px-1.5 py-0.5 rounded tracking-wider uppercase">
             BETA
           </span>
         </div>
+        <select
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
+          className="bg-[#111] border border-white/5 rounded-md px-2 py-1.5 text-xs text-foreground/70 focus:text-foreground outline-none cursor-pointer w-full"
+        >
+          {MODELS.map((model) => (
+            <option
+              key={model.model}
+              value={model.model}
+              className="bg-secondary text-foreground"
+            >
+              {model.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Message List */}
@@ -496,7 +552,7 @@ export default function ReactChatPanel({
             className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
           >
             {m.role === "user" ? (
-              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] text-wrap">
+              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] break-words whitespace-pre-wrap">
                 {m.content}
                 {m.questions && m.questions.length > 0 && (
                   <div className="mt-4">
@@ -536,6 +592,7 @@ export default function ReactChatPanel({
                       <ReactGenerationProgress
                         steps={m.agentSteps}
                         architectData={m.architectData}
+                        motionDesignerData={m.motionDesignerData}
                       />
                     )}
                   </div>
@@ -639,24 +696,17 @@ export default function ReactChatPanel({
             placeholder="Describe your React project..."
             className="w-full bg-transparent text-foreground placeholder-white/30 p-3 min-h-[80px] max-h-[200px] resize-none outline-none overflow-y-auto"
           />
-          <div className="px-2 py-1.5 bg-[#080808] border-t border-white/5 flex items-center justify-between">
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="bg-transparent text-xs text-foreground/60 focus:text-foreground outline-none cursor-pointer max-w-[140px]"
-            >
-              {MODELS.map((model) => (
-                <option
-                  key={model.model}
-                  value={model.model}
-                  className="bg-secondary text-foreground"
-                >
-                  {model.label}
-                </option>
-              ))}
-            </select>
-
+          <div className="px-2 py-1.5 bg-[#080808] border-t border-white/5 flex items-center justify-end">
             <div className="flex items-center gap-1.5">
+              {loading && (
+                <button
+                  onClick={stopGeneration}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors"
+                  title="Stop generation"
+                >
+                  <Square className="w-3.5 h-3.5 fill-current" />
+                </button>
+              )}
               <button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || loading}

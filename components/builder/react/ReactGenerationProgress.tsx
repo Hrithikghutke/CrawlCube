@@ -72,6 +72,7 @@ export function getThinkingLabel(agentSteps?: AgentStep[]): string {
   if (!running) return "Thinking";
 
   if (running.id === "architect") return "Planning files architecture";
+  if (running.id === "motionDesigner") return "Designing animations";
   if (running.id === "developer") return "Starting compilers";
 
   if (running.id.startsWith("page-")) {
@@ -93,14 +94,18 @@ export function ThinkingText({ label = "Thinking" }: { label?: string }) {
 export default function ReactGenerationProgress({
   steps,
   architectData,
+  motionDesignerData,
 }: {
   steps: AgentStep[];
   architectData?: any;
+  motionDesignerData?: any;
 }) {
   const [architectOpen, setArchitectOpen] = React.useState(false);
+  const [motionOpen, setMotionOpen] = React.useState(false);
   const [developerOpen, setDeveloperOpen] = React.useState(true);
 
   const architectStep = steps.find((s) => s.id === "architect");
+  const motionDesignerStep = steps.find((s) => s.id === "motionDesigner");
   const developerStep = steps.find((s) => s.id === "developer");
   const pageSteps = steps.filter((s) => s.id.startsWith("page-"));
 
@@ -221,6 +226,67 @@ export default function ReactGenerationProgress({
         </div>
       )}
 
+      {/* ── Motion Designer block ── */}
+      {motionDesignerStep && (
+        <div className="rounded-lg overflow-hidden border border-border/60 w-full mt-1">
+          <button
+            onClick={() => setMotionOpen(!motionOpen)}
+            className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-background/5 transition-colors cursor-pointer"
+          >
+            <StepIcon status={motionDesignerStep.status} />
+            <span
+              className={`font-semibold tracking-wide flex-1 ${
+                motionDesignerStep.status === "done"
+                  ? "text-muted-foreground"
+                  : motionDesignerStep.status === "running"
+                    ? "text-amber-300"
+                    : "text-muted-foreground"
+              }`}
+            >
+              MOTION DESIGNER
+            </span>
+            <span className="text-muted-foreground truncate mr-2">
+              {motionDesignerStep.status === "running"
+                ? "Crafting animations..."
+                : motionDesignerStep.status === "done"
+                  ? "Animation spec ready"
+                  : ""}
+            </span>
+            <svg
+              className={`w-3 h-3 text-muted-foreground transition-transform ${motionOpen ? "rotate-180" : ""}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          {motionOpen && motionDesignerStep.status === "done" && (
+            <div className="px-3 pb-2 pt-1 border-t border-border/40 bg-background text-muted-foreground text-[10px]">
+              <p className="text-foreground/40 uppercase tracking-widest mb-1">
+                Motion Specification
+              </p>
+              <div className="flex flex-wrap gap-2 text-foreground/80 font-sans">
+                <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">
+                  ✦ Framer Motion animations
+                </span>
+                <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">
+                  ✦ Scroll-triggered reveals
+                </span>
+                <span className="bg-[#151515] px-1.5 py-0.5 rounded border border-white/5">
+                  ✦ Hover interactions
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Developer block ── */}
       {developerStep &&
         (developerStep.status !== "idle" || pageSteps.length > 0) && (
@@ -292,6 +358,23 @@ export default function ReactGenerationProgress({
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+      {/* ── QA block ── */}
+      {developerStep?.status === "done" &&
+        pageSteps.length > 0 &&
+        pageSteps.every((p) => p.status === "done") && (
+          <div className="rounded-lg border border-border/60 overflow-hidden w-full mt-1">
+            <div className="w-full flex items-center gap-2 px-3 py-2 text-left bg-emerald-500/5">
+              <StepIcon status="done" />
+              <span className="font-semibold tracking-wide flex-1 text-emerald-500/90">
+                QA CHECK
+              </span>
+              <span className="text-muted-foreground mr-2 text-[10px]">
+                Compilation clear • Passive monitoring active
+              </span>
+            </div>
           </div>
         )}
     </div>

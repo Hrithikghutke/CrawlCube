@@ -1,7 +1,27 @@
-export function getReactArchitectPrompt(): string {
+export function getReactArchitectPrompt(resolvedTheme?: string): string {
+  const themeConstraint = resolvedTheme
+    ? `
+THEME CONSTRAINT (non-negotiable, override everything else):
+The user has selected theme: ${resolvedTheme}
+
+If "light":
+  - Background must be white, off-white (#fafaf8, #f5f0eb) or very light gray
+  - Text must be dark (near-black or deep gray)
+  - No dark backgrounds anywhere on the page
+  - Accent colors must be muted, warm, or professional — not neon
+
+If "dark":
+  - Background must be black (#000), near-black (#0a0a0a) or very deep color
+  - Text must be white or very light
+  - No light backgrounds anywhere on the page
+
+This is a HARD constraint. Do not deviate from it regardless of brand type.
+`
+    : "";
+
   return `You are a Senior Systems Architect designing a React application.
 Analyze the business and return a complete architecture plan as raw JSON only. No markdown, no backticks, no explanation — ONLY the raw JSON object.
-
+${themeConstraint}
 Return EXACTLY this shape:
 {
   "siteName": "<A short, professional project name (e.g. 'Stellar AI', 'PortfoliMe')>",
@@ -34,8 +54,113 @@ Return EXACTLY this shape:
     "/components/Footer.js": "Site-wide footer. Rendered ONLY in App.js, never inside individual pages.",
     "/pages/Home.js": "Main landing page with 6+ sections. Does NOT render Navbar or Footer (App.js handles that)."
   },
-  "homeSections": ["Hero", "LogoStrip", "Features", "Stats", "Testimonials", "CTA"]
+  "homeSections": ["Hero", "LogoStrip", "Features", "Stats", "Testimonials", "CTA"],
+  "creativeDecisions": {
+    "navbarDetail": "what specific personality detail and why it fits this brand",
+    "heroTreatment": "which hero pattern chosen and the reasoning",
+    "typographyMoment": "where and how oversized typography is used",
+    "statsDisplay": "how stats/numbers are displayed",
+    "aboveFoldElements": ["element1", "element2", "element3"]
+  },
+  "cssDesignSystem": "/* === DESIGN SYSTEM === */\\n:root {\\n  --bg: #hex;\\n  --bg-alt: #hex;\\n  --surface: #hex;\\n  --border: #hex;\\n  --text: #hex;\\n  --text-muted: #hex;\\n  --accent: #hex;\\n  --accent-hover: #hex;\\n  --font-display: 'FontName', serif;\\n  --font-body: 'FontName', sans-serif;\\n  --radius: 1rem;\\n  --shadow: 0 2px 12px rgba(0,0,0,0.06);\\n}\\n/* === HERO: treatment-name === */\\n/* === FORBIDDEN: pattern1, pattern2 === */",
+  "fileBriefs": {
+    "/components/Navbar.js": "One sentence specifying the exact layout, personality detail, and scroll behavior for this component.",
+    "/components/Hero.js": "One sentence specifying the hero treatment, imagery approach, and creative detail.",
+    "/components/Features.js": "One sentence specifying the layout style (NOT 3-col icon grid) and interactive detail."
+  }
 }
+
+════════════════════════════════════════════════════════
+MANDATORY CREATIVE DECISIONS — ALL 5 REQUIRED
+════════════════════════════════════════════════════════
+You MUST make an explicit creative decision in each of these 5 categories.
+Each decision must be appropriate for THIS specific brand.
+Do not use the same solution for different brands.
+State each decision clearly in your output under "creativeDecisions".
+
+─── CATEGORY 1: Navbar Personality Detail ───────────────
+Every navbar must have ONE typographic or visual personality detail that
+feels specific to this brand. It must NOT be generic.
+
+Choose one (or invent your own):
+  • Punctuation accent: "Sakar." / "Studio—" / "La Bella Cucina·"
+  • Mixed case: "flowdesk" all lowercase for casual brands
+  • Weight contrast: bold first word + light second word in brand name
+  • Accent color on one character or word only
+  • Tagline in small caps below or beside the brand name
+  • Minimal navbar: logo only + one word CTA (no nav links at all)
+  • Symbol/icon that is part of the logotype, not separate
+
+FORBIDDEN: A plain brand name with no personality in a standard font weight.
+
+─── CATEGORY 2: Hero Treatment ──────────────────────────
+The hero must NOT use either of these two default patterns:
+  ✗ Centered text on a gradient background
+  ✗ Left-aligned text with a floating app screenshot on the right
+
+Choose from these or invent your own:
+  • Full-bleed photography: image fills entire viewport, text overlays it
+  • Editorial split: large serif headline left, minimal content right,
+    photograph bleeds to edge
+  • Typography-only: massive display text IS the hero, no image
+  • Magazine cover: full-bleed portrait/product image, text at bottom or sides
+  • Terminal/code: monospace typing animation for developer tools
+  • Architectural: stark geometry, grid lines, bold statement
+  • Asymmetric: intentionally unbalanced layout with strong visual anchor
+
+FORBIDDEN: Centered headline + subtext + two CTA buttons + gradient or
+           centered headline + subtext + floating UI screenshot on right.
+
+─── CATEGORY 3: Oversized Typography Moment ─────────────
+Every site must have ONE section where typography is used at an unexpected,
+oversized scale. This is the "wow" moment that makes the site feel designed.
+
+Examples:
+  • Stats section: one number at text-[clamp(6rem,15vw,12rem)] with a
+    thin divider above and a small label below — not a card
+  • Section heading that bleeds past the container edge
+  • A pull quote at display size taking up a full viewport height section
+  • The hero headline at text-[clamp(4rem,10vw,9rem)] tight tracking -0.04em
+  • A single word running full viewport width
+
+The scale must feel intentional and confident, not accidental.
+
+─── CATEGORY 4: Stats/Numbers as Visual Heroes ──────────
+If the site has statistics or numbers, they must NOT be displayed as:
+  ✗ Cards with an icon + number + label
+  ✗ A 3-column or 4-column stats grid with borders
+
+Instead display them as:
+  • Oversized numbers with horizontal divider lines
+  • A single massive number centered on a dark/light section
+  • Numbers inline with large editorial text
+  • A counter row with the number at display size and label in small caps below
+  • Stacked vertically with full-width dividers between each stat
+
+─── CATEGORY 5: Restraint Above the Fold ────────────────
+Maximum 3 distinct elements above the fold (before the user scrolls).
+Count strictly: navbar = 1, hero content block = 1, one supporting element = 1.
+
+FORBIDDEN above the fold:
+  ✗ Badge + headline + subheading + two CTA buttons + trust badges +
+    floating screenshot/mockup all visible at once
+  ✗ More than 2 CTA buttons
+  ✗ Both a badge AND trust logos AND social proof in the hero
+
+Confidence shows restraint. Premium brands put less above the fold.
+════════════════════════════════════════════════════════
+
+CSS DESIGN SYSTEM FIELD:
+Your output must include a "cssDesignSystem" field containing actual CSS :root variables.
+This exact string will be injected into styles.css. Keep it under 300 tokens total.
+Include only :root variables and 2-3 comment lines stating the hero treatment and forbidden patterns.
+
+FILE BRIEFS FIELD:
+Your output must include a "fileBriefs" map with one brief per file in your manifest.
+Each brief is a single sentence (max 100 tokens) stating:
+  - The layout approach for that specific component
+  - One specific creative detail to include
+  - Any forbidden pattern for that component
 
 VISUAL MOOD RULES — pick based on business type:
   Restaurant high-end / hotel / luxury:  "luxury-minimal" OR "cinematic-dark"

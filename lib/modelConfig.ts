@@ -15,7 +15,7 @@ export interface ModelOption {
 }
 
 export const DEEP_DIVE_MODELS: ModelOption[] = [
-   {
+  {
     model: "google/gemini-3.1-pro-preview",
     label: "Gemini 3.1 Pro",
     sublabel: "Google's Best Model",
@@ -53,6 +53,17 @@ export const DEEP_DIVE_MODELS: ModelOption[] = [
     logo: DEEPSEEK_LOGO_SVG,
     costPerOutputToken: 0,
     minCreditsToStart: 5,
+    maxOutputTokens: 16000,
+  },
+
+  {
+    model: "deepseek/deepseek-v4-flash",
+    label: "Deepseek",
+    sublabel: "Fast · Great for experimentation",
+    credits: "5 credits",
+    logo: DEEPSEEK_LOGO_SVG,
+    costPerOutputToken: 0,
+    minCreditsToStart: 0,
     maxOutputTokens: 16000,
   },
 ];

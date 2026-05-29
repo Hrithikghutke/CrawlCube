@@ -4,6 +4,7 @@ import { getUserCredits, deductCredits, trackApiUsage } from "@/lib/firestore";
 import { getModelConfig, calculateCredits } from "@/lib/modelConfig";
 import { getReactArchitectPrompt } from "@/lib/reactAgents/architect";
 import { getReactDeveloperPrompt } from "@/lib/reactAgents/developer";
+import { getMotionDesignerSystemPrompt, getMotionDesignerUserPrompt } from "@/lib/reactAgents/motionDesigner";
 
 export const maxDuration = 120;
 
@@ -61,8 +62,20 @@ export async function POST(req: Request) {
   if (!userId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { prompt, model, existingFiles } = await req.json();
+  const { prompt, model, existingFiles, themePreference = "auto" } = await req.json();
   const GENERATION_MODEL = model ?? "anthropic/claude-3.5-sonnet";
+
+  // Resolve theme based on user preference + prompt context
+  function resolveTheme(pref: string, userPrompt: string): "light" | "dark" {
+    if (pref === "light") return "light";
+    if (pref === "dark") return "dark";
+    const p = userPrompt.toLowerCase();
+    const darkKeywords = ["saas", "tech", "crypto", "gaming", "ai tool",
+      "developer", "cybersecurity", "agency", "startup", "dashboard", "software",
+      "devtools", "nightlife", "dark"];
+    return darkKeywords.some(kw => p.includes(kw)) ? "dark" : "light";
+  }
+  const resolvedTheme = resolveTheme(themePreference, prompt);
 
   const credits = await getUserCredits(userId);
   const minRequired = getModelConfig(GENERATION_MODEL).minCreditsToStart;
@@ -111,10 +124,10 @@ export async function POST(req: Request) {
             },
             body: JSON.stringify({
               model: GENERATION_MODEL,
-              max_tokens: 1000,
+              max_tokens: 2500,
               temperature: 0.2,
               messages: [
-                { role: "system", content: getReactArchitectPrompt() },
+                { role: "system", content: getReactArchitectPrompt(resolvedTheme) },
                 {
                   role: "user",
                   content: `User Prompt: ${prompt}${extFilesHint}`,
@@ -124,7 +137,10 @@ export async function POST(req: Request) {
           },
         );
 
-        if (!archRes.ok) throw new Error("Architect generation failed");
+        if (!archRes.ok) {
+          const errText = await archRes.text().catch(() => "");
+          throw new Error(`Architect generation failed: ${archRes.status} ${archRes.statusText} - ${errText}`);
+        }
         const archData = await archRes.json();
         const archRaw = archData.choices?.[0]?.message?.content ?? "{}";
 
@@ -170,9 +186,55 @@ export async function POST(req: Request) {
             brandName: generatedSiteName,
             colors: archResult.colors || {},
             fonts: archResult.fonts || {},
-            manifest: archResult.manifest || {}
+            manifest: archResult.manifest || {},
+            creativeDecisions: archResult.creativeDecisions || {},
           }
         });
+
+        // --- PHASE 1.5: MOTION DESIGNER ---
+        send({
+          action: "agent-update",
+          step: { id: "motionDesigner", status: "running", label: "Motion Designer" },
+        });
+
+        let motionSpecText = "{}";
+        try {
+          const motionRes = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "anthropic/claude-haiku-4.5",
+                max_tokens: 2000,
+                temperature: 0.5,
+                messages: [
+                  { role: "system", content: getMotionDesignerSystemPrompt() },
+                  { role: "user", content: getMotionDesignerUserPrompt(archRaw) },
+                ],
+              }),
+            },
+          );
+          if (motionRes.ok) {
+            const motionData = await motionRes.json();
+            motionSpecText = motionData.choices?.[0]?.message?.content ?? "{}";
+            totalInputTokens += motionData.usage?.prompt_tokens ?? 0;
+            totalOutputTokens += motionData.usage?.completion_tokens ?? 0;
+          }
+        } catch (e) {
+          console.warn("Motion Designer failed, continuing without:", e);
+        }
+
+        send({
+          action: "agent-update",
+          step: { id: "motionDesigner", status: "done" },
+          motionDesignerData: motionSpecText !== "{}" ? { spec: "Motion spec generated" } : undefined,
+        });
+
+        // --- PHASE 2: PARALLEL FILE WRITERS ---
         send({
           action: "agent-update",
           step: {
@@ -182,6 +244,10 @@ export async function POST(req: Request) {
             label: "Developer",
           },
         });
+
+        // Build compact per-file context from architect's new fields
+        const cssDesignSystem = archResult.cssDesignSystem ?? "";
+        const fileBriefs = archResult.fileBriefs ?? {};
 
         const developerPrompt = getReactDeveloperPrompt({
           theme: archResult.theme,
@@ -228,6 +294,15 @@ export async function POST(req: Request) {
                     role: "user",
                     content: `MAIN TASK: ${prompt}
 CRITICAL: You are ONLY writing ${filePath}.
+
+CSS DESIGN SYSTEM (use these variables, do not hardcode values):
+${cssDesignSystem}
+
+YOUR COMPONENT BRIEF:
+${fileBriefs[filePath] ?? "Build this component following the design system above."}
+
+MOTION SPECIFICATION:
+${motionSpecText}
 ${currentCodeInfo}${fileContextMsg}`,
                   },
                 ],
@@ -235,7 +310,10 @@ ${currentCodeInfo}${fileContextMsg}`,
             },
           );
 
-          if (!pageRes.ok) throw new Error(`Failed generating ${filePath}`);
+          if (!pageRes.ok) {
+            const errText = await pageRes.text().catch(() => "");
+            throw new Error(`Failed generating ${filePath}: ${pageRes.status} ${pageRes.statusText} - ${errText}`);
+          }
           const pageData = await pageRes.json();
           const rawContent = pageData.choices?.[0]?.message?.content || "";
 

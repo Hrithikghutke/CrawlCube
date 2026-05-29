@@ -644,7 +644,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { prompt, model: selectedModel, fixes } = await req.json();
+  const { prompt, model: selectedModel, fixes, themePreference = "auto" } = await req.json();
+
+  // Resolve theme based on user preference + prompt context
+  function resolveTheme(pref: string, userPrompt: string): "light" | "dark" {
+    if (pref === "light") return "light";
+    if (pref === "dark") return "dark";
+    const p = userPrompt.toLowerCase();
+    const darkKeywords = ["saas", "tech", "crypto", "gaming", "ai tool",
+      "developer", "cybersecurity", "agency", "startup", "dashboard", "software",
+      "devtools", "nightlife", "dark"];
+    return darkKeywords.some(kw => p.includes(kw)) ? "dark" : "light";
+  }
+  const resolvedTheme = resolveTheme(themePreference, prompt);
 
   // Minimum credits needed to even start (actual cost calculated after generation)
   // Use a small upfront check so users with 0 credits can't start at all
@@ -766,7 +778,7 @@ export async function POST(req: Request) {
           const { content: rawArchitect, outputTokens: architectTokens } =
             await haikuExecutor.execute(
               () => callOpenRouterJson(
-                getArchitectPrompt(),
+                getArchitectPrompt(resolvedTheme),
                 `Business to build a website for: ${prompt}`,
                 clientSignal,
               ),

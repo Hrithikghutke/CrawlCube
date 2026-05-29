@@ -1041,6 +1041,10 @@ export default function ChatPanel({
     }, 50000); // warn at 50 seconds
 
     try {
+      // Extract theme preference from the brief or prompt
+      const themeMatch = (briefRef.current || prompt).match(/\b(dark|light)\b/i);
+      const themePreference = themeMatch ? themeMatch[1].toLowerCase() : "auto";
+
       const res = await fetch("/api/generate-deep", {
         method: "POST",
         headers: {
@@ -1052,6 +1056,7 @@ export default function ChatPanel({
           prompt,
           model: selectedModel,
           fixes: fixes ?? [],
+          themePreference,
         }),
         signal: abortController.signal,
       });
