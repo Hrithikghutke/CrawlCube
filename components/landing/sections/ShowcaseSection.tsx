@@ -209,91 +209,93 @@ export default function ShowcaseSection() {
       </section>
 
       {/* Full-Screen Preview Modal */}
-      {mounted && selectedPreview && createPortal(
-        <div className="fixed inset-0 z-[100] bg-background flex flex-col md:flex-row h-screen overflow-hidden animate-in fade-in duration-200">
-          {/* Left Sidebar (Top bar on mobile) */}
-          <div className="w-full md:w-[320px] shrink-0 bg-background border-b md:border-b-0 md:border-r border-border flex flex-col h-auto md:h-full relative z-20">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 md:p-5 border-b border-border">
-              <h2 className="text-foreground font-bold text-base md:text-lg truncate pr-4">
-                {selectedPreview.title}
-              </h2>
-              <button
-                onClick={closePreview}
-                className="text-muted-foreground hover:text-foreground transition-colors bg-background hover:bg-secondary/40 p-1.5 rounded-md"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {/* Description - Expandable or hidden on mobile to prioritize preview */}
-            <div className="hidden md:flex flex-col p-5 flex-1 overflow-y-auto">
-              <p className="text-sm leading-relaxed text-muted-foreground mb-4">
-                {selectedPreview.description}
-              </p>
-              <div className="bg-secondary/10 border border-border p-3 rounded-lg flex flex-col gap-1 mt-auto">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                  Generated Using
-                </span>
-                <span className="text-sm text-foreground/80 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]"></span>{" "}
-                  {selectedPreview.model || "Gemini 3.1 Pro"}
-                </span>
+      {mounted &&
+        selectedPreview &&
+        createPortal(
+          <div className="fixed inset-0 z-100 bg-background flex flex-col md:flex-row h-screen overflow-hidden animate-in fade-in duration-200">
+            {/* Left Sidebar (Top bar on mobile) */}
+            <div className="w-full md:w-[320px] shrink-0 bg-background border-b md:border-b-0 md:border-r border-border flex flex-col h-auto md:h-full relative z-20">
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 md:p-5 border-b border-border">
+                <h2 className="text-foreground font-bold text-base md:text-lg truncate pr-4">
+                  {selectedPreview.title}
+                </h2>
+                <button
+                  onClick={closePreview}
+                  className="text-muted-foreground hover:text-foreground transition-colors bg-background hover:bg-secondary/40 p-1.5 rounded-md"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-          </div>
-
-          {/* Right Main Content */}
-          <div className="flex-1 flex flex-col relative h-[calc(100vh-65px)] md:h-full bg-background overflow-hidden">
-            {/* Navbar (Hidden on mobile) */}
-            <div className="hidden md:flex h-14 border-b border-border items-center justify-center px-4 bg-background relative z-10">
-              <div className="flex items-center gap-1 bg-secondary/10 border border-border rounded-lg p-1">
-                <button
-                  onClick={() => setDeviceView("desktop")}
-                  className={`p-1.5 rounded-md transition-colors ${deviceView === "desktop" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
-                >
-                  <Monitor className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setDeviceView("tablet")}
-                  className={`p-1.5 rounded-md transition-colors ${deviceView === "tablet" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
-                >
-                  <Tablet className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setDeviceView("mobile")}
-                  className={`p-1.5 rounded-md transition-colors ${deviceView === "mobile" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
-                >
-                  <MobileIcon className="w-4 h-4" />
-                </button>
+              {/* Description - Expandable or hidden on mobile to prioritize preview */}
+              <div className="hidden md:flex flex-col p-5 flex-1 overflow-y-auto">
+                <p className="text-sm leading-relaxed text-muted-foreground mb-4">
+                  {selectedPreview.description}
+                </p>
+                <div className="bg-secondary/10 border border-border p-3 rounded-lg flex flex-col gap-1 mt-auto">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                    Generated Using
+                  </span>
+                  <span className="text-sm text-foreground/80 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]"></span>{" "}
+                    {selectedPreview.model || "Gemini 3.1 Pro"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Preview Frame */}
-            <div
-              className={`flex-1 w-full h-full pb-0 sm:pb-8 md:pb-12 px-0 pt-0 sm:px-8 md:px-12 sm:pt-8 md:pt-12 overflow-y-auto flex items-start justify-center ${selectedPreview.iframeUrl && deviceView === "desktop" ? "p-0 sm:p-0 md:p-0 overflow-hidden" : ""}`}
-            >
+            {/* Right Main Content */}
+            <div className="flex-1 flex flex-col relative h-[calc(100vh-65px)] md:h-full bg-background overflow-hidden">
+              {/* Navbar (Hidden on mobile) */}
+              <div className="hidden md:flex h-14 border-b border-border items-center justify-center px-4 bg-background relative z-10">
+                <div className="flex items-center gap-1 bg-secondary/10 border border-border rounded-lg p-1">
+                  <button
+                    onClick={() => setDeviceView("desktop")}
+                    className={`p-1.5 rounded-md transition-colors ${deviceView === "desktop" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
+                  >
+                    <Monitor className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setDeviceView("tablet")}
+                    className={`p-1.5 rounded-md transition-colors ${deviceView === "tablet" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
+                  >
+                    <Tablet className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setDeviceView("mobile")}
+                    className={`p-1.5 rounded-md transition-colors ${deviceView === "mobile" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground/80"}`}
+                  >
+                    <MobileIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview Frame */}
               <div
-                className={`${deviceView === "mobile" ? "w-full md:w-[390px]" : deviceView === "tablet" ? "w-full md:w-[768px]" : "w-full max-w-[1200px]"} bg-background md:rounded-xl overflow-hidden md:shadow-[0_0_50px_rgba(0,0,0,0.5)] md:border border-border h-full transition-all duration-300 ${selectedPreview.iframeUrl && deviceView === "desktop" ? "max-w-none md:rounded-none border-0" : "min-h-full sm:min-h-0"}`}
+                className={`flex-1 w-full h-full pb-0 sm:pb-8 md:pb-12 px-0 pt-0 sm:px-8 md:px-12 sm:pt-8 md:pt-12 overflow-y-auto flex items-start justify-center ${selectedPreview.iframeUrl && deviceView === "desktop" ? "p-0 sm:p-0 md:p-0 overflow-hidden" : ""}`}
               >
-                {selectedPreview.iframeUrl ? (
-                  <iframe
-                    src={selectedPreview.iframeUrl}
-                    className="w-full h-full border-0 bg-background"
-                    title={selectedPreview.title}
-                  />
-                ) : (
-                  <img
-                    src={selectedPreview.image}
-                    alt={selectedPreview.title}
-                    className="w-full h-auto block"
-                  />
-                )}
+                <div
+                  className={`${deviceView === "mobile" ? "w-full md:w-[390px]" : deviceView === "tablet" ? "w-full md:w-[768px]" : "w-full max-w-[1200px]"} bg-background md:rounded-xl overflow-hidden md:shadow-[0_0_50px_rgba(0,0,0,0.5)] md:border border-border h-full transition-all duration-300 ${selectedPreview.iframeUrl && deviceView === "desktop" ? "max-w-none md:rounded-none border-0" : "min-h-full sm:min-h-0"}`}
+                >
+                  {selectedPreview.iframeUrl ? (
+                    <iframe
+                      src={selectedPreview.iframeUrl}
+                      className="w-full h-full border-0 bg-background"
+                      title={selectedPreview.title}
+                    />
+                  ) : (
+                    <img
+                      src={selectedPreview.image}
+                      alt={selectedPreview.title}
+                      className="w-full h-auto block"
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
