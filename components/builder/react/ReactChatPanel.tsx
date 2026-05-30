@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Eye, RotateCcw, Clock, Box, LoaderCircle, Square } from "lucide-react";
+import {
+  Send,
+  Eye,
+  RotateCcw,
+  Clock,
+  Box,
+  LoaderCircle,
+  Square,
+} from "lucide-react";
 import { GeneratedReactFiles } from "@/types/react-generation";
 import { DEEP_DIVE_MODELS, getModelConfig } from "@/lib/modelConfig";
 import { useCredits } from "@/context/CreditsContext";
@@ -293,7 +301,7 @@ export default function ReactChatPanel({
       createdAt: new Date(),
     };
     const aiMsgId = crypto.randomUUID();
-    
+
     const initAiMsg: ReactMessage = {
       id: aiMsgId,
       role: "assistant",
@@ -349,8 +357,8 @@ export default function ReactChatPanel({
                   questions: routerData.questions,
                   isGenerating: false,
                 }
-              : m
-          )
+              : m,
+          ),
         );
         setLoading(false);
         return;
@@ -359,21 +367,34 @@ export default function ReactChatPanel({
       routerAction = routerData.action;
       resolvedPrompt = routerData.prompt || text;
       if (routerData.themePreference) {
-        briefRef.current = (briefRef.current || "") + `\nTheme preference: ${routerData.themePreference}`;
+        briefRef.current =
+          (briefRef.current || "") +
+          `\nTheme preference: ${routerData.themePreference}`;
       }
 
       // The initAiMsg is already in the messages array and has isGenerating=true.
       // We just leave it as is so the SSE stream can update it.
 
       // Extract theme from brief or prompt text
-      const combinedText = `${briefRef.current || ""} ${resolvedPrompt}`.toLowerCase();
+      const combinedText =
+        `${briefRef.current || ""} ${resolvedPrompt}`.toLowerCase();
       let themePreference = "auto";
-      if (/\b(dark|dark\s*mode|dark\s*theme|black\s*background|night)\b/.test(combinedText)) {
+      if (
+        /\b(dark|dark\s*mode|dark\s*theme|black\s*background|night)\b/.test(
+          combinedText,
+        )
+      ) {
         themePreference = "dark";
-      } else if (/\b(light|light\s*mode|light\s*theme|white\s*background|bright|clean\s*white|minimal\s*white)\b/.test(combinedText)) {
+      } else if (
+        /\b(light|light\s*mode|light\s*theme|white\s*background|bright|clean\s*white|minimal\s*white)\b/.test(
+          combinedText,
+        )
+      ) {
         themePreference = "light";
       } else {
-        const briefTheme = briefRef.current?.match(/Theme preference:\s*(light|dark|auto)/i);
+        const briefTheme = briefRef.current?.match(
+          /Theme preference:\s*(light|dark|auto)/i,
+        );
         if (briefTheme) themePreference = briefTheme[1].toLowerCase();
       }
 
@@ -427,7 +448,8 @@ export default function ReactChatPanel({
                           ...m,
                           agentSteps: existing,
                           architectData: data.architectData || m.architectData,
-                          motionDesignerData: data.motionDesignerData || m.motionDesignerData,
+                          motionDesignerData:
+                            data.motionDesignerData || m.motionDesignerData,
                         };
                       }
                       return m;
@@ -486,9 +508,13 @@ export default function ReactChatPanel({
         setMessages((prev) =>
           prev.map((m) =>
             m.id === aiMsgId
-              ? { ...m, content: "Generation stopped by user.", isGenerating: false }
-              : m
-          )
+              ? {
+                  ...m,
+                  content: "Generation stopped by user.",
+                  isGenerating: false,
+                }
+              : m,
+          ),
         );
         return;
       }
@@ -552,7 +578,7 @@ export default function ReactChatPanel({
             className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}
           >
             {m.role === "user" ? (
-              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] break-words whitespace-pre-wrap">
+              <div className="bg-indigo-600/90 text-foreground px-4 py-2.5 rounded-2xl max-w-[90%] wrap-break-word whitespace-pre-wrap">
                 {m.content}
                 {m.questions && m.questions.length > 0 && (
                   <div className="mt-4">

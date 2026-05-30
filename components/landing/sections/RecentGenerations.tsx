@@ -62,7 +62,7 @@ export default function RecentGenerations() {
   if (loading || generations.length === 0) return null;
 
   return (
-    <div className="bg-background drop-shadow-2xl py-10 px-10 rounded-2xl w-full max-w-5xl mx-auto mt-12  sm:px-6 mb-16 relative z-10 /60 pt-6">
+    <div className="bg-secondary drop-shadow-2xl py-10 px-10 rounded-2xl w-full max-w-5xl mx-auto mt-12  sm:px-6 mb-16 relative z-10 /60 pt-6">
       {/* Top Header / Tabs */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-6">

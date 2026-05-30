@@ -12,6 +12,7 @@ import {
   Tablet,
   Smartphone as MobileIcon,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 type ShowcaseItem = {
   id: number;
@@ -87,8 +88,10 @@ export default function ShowcaseSection() {
   const [deviceView, setDeviceView] = useState<"desktop" | "tablet" | "mobile">(
     "desktop",
   );
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handlePopState = () => {
       if (selectedPreview) setSelectedPreview(null);
     };
@@ -206,8 +209,8 @@ export default function ShowcaseSection() {
       </section>
 
       {/* Full-Screen Preview Modal */}
-      {selectedPreview && (
-        <div className="fixed inset-0 z-100 bg-background flex flex-col md:flex-row h-screen overflow-hidden animate-in fade-in duration-200">
+      {mounted && selectedPreview && createPortal(
+        <div className="fixed inset-0 z-[100] bg-background flex flex-col md:flex-row h-screen overflow-hidden animate-in fade-in duration-200">
           {/* Left Sidebar (Top bar on mobile) */}
           <div className="w-full md:w-[320px] shrink-0 bg-background border-b md:border-b-0 md:border-r border-border flex flex-col h-auto md:h-full relative z-20">
             {/* Header */}
@@ -288,7 +291,8 @@ export default function ShowcaseSection() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
